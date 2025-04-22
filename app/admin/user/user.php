@@ -19,7 +19,7 @@ $result = mysqli_query($conn, "SELECT nama, email, role FROM user");
 
     <!-- Page Heading -->
     <h1 class="h3 mb-2 text-gray-800">Pengguna</h1>
-    <a href="" class="btn btn-primary mb-2">Tambah Data</a>
+    <a href="tambah.php" class="btn btn-primary mb-2">Tambah Data</a>
 
 
     <!-- DataTales Example -->
@@ -53,8 +53,8 @@ $result = mysqli_query($conn, "SELECT nama, email, role FROM user");
                                     <td><?= $user['email']; ?></td>
                                     <td><?= $user['role'] ?></td>
                                     <td>
-                                        <a href="#" class="badge rounded-pill text-bg-success">Edit</a>
-                                        <a href="#" class="badge rounded-pill text-bg-danger tombol-hapus">Hapus</a>
+                                        <a href="#" class="btn btn-success"><i class="far fa-edit"></i></a>
+                                        <a href="#" class="btn btn-danger tombol-hapus"><i class="far fa-trash-alt"></i></a>
                                     </td>
                                 </tr>
                             <?php endwhile; ?>
