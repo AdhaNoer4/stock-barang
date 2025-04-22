@@ -1,5 +1,5 @@
 <?php
-
+session_start();
 // Koneksi ke database
 require_once '../config.php';
 
@@ -35,7 +35,6 @@ if (isset($_POST['login'])) {
         } else {
             echo "<script>alert('Password salah!');</script>";
         }
-
     } else {
         echo "<script>alert('Email tidak terdaftar!');</script>";
     }
@@ -87,6 +86,17 @@ if (isset($_POST['login'])) {
                                     <div class="text-center">
                                         <h1 class="h4 text-gray-900 mb-4">Login</h1>
                                     </div>
+                                    <?php
+
+                                    if (isset($_GET['pesan'])) {
+                                        if ($_GET['pesan'] === "belum_login") {
+                                            echo "<script>alert('Anda belum login!');</script>";
+                                        } elseif ($_GET['pesan'] === 'tolak_akses') {
+                                            echo "<script>alert('Akses ke halaman ini ditolak!');</script>";
+                                        }
+                                    }
+
+                                    ?>
                                     <form class="user" method="post">
                                         <div class="form-group">
                                             <input type="email" class="form-control form-control-user"
