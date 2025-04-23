@@ -9,7 +9,7 @@ $judul = "Data Pengguna";
 include('../layouts/header.php');
 require_once('../../../config.php');
 
-$result = mysqli_query($conn, "SELECT nama, email, role FROM user");
+$result = mysqli_query($conn, "SELECT id_user, nama, email, role FROM user");
 
 ?>
 
@@ -53,8 +53,8 @@ $result = mysqli_query($conn, "SELECT nama, email, role FROM user");
                                     <td><?= $user['email']; ?></td>
                                     <td><?= $user['role'] ?></td>
                                     <td>
-                                        <a href="#" class="btn btn-success"><i class="far fa-edit"></i></a>
-                                        <a href="#" class="btn btn-danger tombol-hapus"><i class="far fa-trash-alt"></i></a>
+                                        <a href="edit.php?id=<?= $user['id_user'] ?>" class="btn btn-success"><i class="far fa-edit"></i></a>
+                                        <a href="hapus.php?id=<?= $user['id_user'] ?>" class="btn btn-danger tombol-hapus"><i class="far fa-trash-alt"></i></a>
                                     </td>
                                 </tr>
                             <?php endwhile; ?>
