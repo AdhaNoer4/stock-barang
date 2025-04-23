@@ -49,7 +49,7 @@ if (isset($_POST['submit'])) {
         } else {
             $users = mysqli_query($conn, "INSERT INTO user( nama, email, password, role) VALUES ('$nama','$email','$password','$role')");
 
-            echo "<script>alert('Data berhasil disimpan!');</script>";
+            $_SESSION['berhasil'] = "Data berhasil ditambahkan!";
             header('Location: user.php');
             exit;
         }

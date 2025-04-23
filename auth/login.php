@@ -23,6 +23,7 @@ if (isset($_POST['login'])) {
 
         if (password_verify($password, $row["password"])) {
             $_SESSION["login"] = true;
+            $_SESSION['nama'] = $row['nama'];
             $_SESSION['role'] = $row['role'];
             $_SESSION['id_user'] = $row['id_user'];
 
@@ -33,10 +34,10 @@ if (isset($_POST['login'])) {
             }
             exit();
         } else {
-            echo "<script>alert('Password salah!');</script>";
+            $_SESSION["gagal"] = "Password Salah!";
         }
     } else {
-        echo "<script>alert('Email tidak terdaftar!');</script>";
+        $_SESSION["gagal"] = "Email tidak terdaftar!";
     }
 }
 ?>
@@ -139,6 +140,20 @@ if (isset($_POST['login'])) {
 
     <!-- Custom scripts for all pages-->
     <script src="../assets/js/sb-admin-2.min.js"></script>
+    <!-- Sweetalert -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <?php if (isset($_SESSION["gagal"])) { ?>
+        <script>
+            Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: "<?= $_SESSION["gagal"]; ?>",
+
+            });
+        </script>
+        <?php unset($_SESSION["gagal"]); ?>
+    <?php  } ?>
 
 </body>
 

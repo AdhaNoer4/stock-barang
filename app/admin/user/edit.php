@@ -15,7 +15,6 @@ if (isset($_POST['edit'])) {
     $id = htmlspecialchars($_POST['id']);
     $nama = htmlspecialchars($_POST['nama']);
     $role = htmlspecialchars($_POST['role']);
-    $status = htmlspecialchars($_POST['status']);
     $email = htmlspecialchars($_POST['email']);
 
     if (empty($_POST['password'])) {
