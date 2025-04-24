@@ -64,7 +64,7 @@
 
             <!-- Nav Item - Stock Masuk -->
             <li class="nav-item">
-                <a class="nav-link" href="#">
+                <a class="nav-link" href="../stock_masuk/stock_masuk.php">
                     <i class="fas fa-box-open"></i>
                     <span>Stock Masuk</span></a>
             </li>
