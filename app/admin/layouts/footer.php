@@ -114,6 +114,20 @@
     <?php unset($_SESSION['berhasil']) ?>
 <?php endif; ?>
 
+<!-- alert gagal -->
+<?php if (isset($_SESSION["gagal"])) { ?>
+    <script>
+        Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: "<?= $_SESSION["gagal"]; ?>",
+
+        });
+    </script>
+    <?php unset($_SESSION["gagal"]); ?>
+<?php  } ?>
+
+
 <!-- alert konfirmasi hapus -->
 <script>
     $('.tombol-hapus').on('click', function() {

@@ -1,20 +1,14 @@
 <?php
-session_start();
-ob_start();
-if (!isset($_SESSION["login"])) {
-    header("Location: ../../auth/login.php?pesan=belum_login");
-} else if ($_SESSION["role"] !== "admin") {
-    header("Location: ../../auth/login.php?pesan=tolak_akses");
-}
+require_once('proses_masuk.php');
 $judul = "Tambah Pengguna";
 include('../layouts/header.php');
-require_once('../../../config.php');
+
 
 $barang = mysqli_query($conn, "SELECT * FROM stock ORDER BY idbarang DESC LIMIT 1");
 ?>
 <div class="page-body">
     <div class="container-xl">
-        <form action="proses_masuk.php" method="POST" enctype="multipart/form-data">
+        <form method="POST" enctype="multipart/form-data">
             <div class="row">
                 <div class="col-md-6">
                     <div class="card">

@@ -46,4 +46,4 @@ if (isset($_POST['submit'])) {
     }
 }
 
-include('../layouts/footer.php');
+
