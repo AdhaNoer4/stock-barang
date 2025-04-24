@@ -70,7 +70,7 @@
             </li>
             <!-- Nav Item - Stock keluar -->
             <li class="nav-item">
-                <a class="nav-link" href="#">
+                <a class="nav-link" href="../stock_keluar/stock_keluar.php">
                     <i class="fas fa-truck-loading"></i>
                     <span>Stock Keluar</span></a>
             </li>

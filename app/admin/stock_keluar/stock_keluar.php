@@ -1,5 +1,5 @@
 <?php
-require_once('proses_masuk.php');
+require_once('proses_keluar.php');
 $judul = "Tambah Pengguna";
 include('../layouts/header.php');
 
@@ -10,7 +10,7 @@ $barang = mysqli_query($conn, "SELECT * FROM stock ORDER BY idbarang DESC LIMIT 
 <div class="container-fluid">
 
     <!-- Page Heading -->
-    <h1 class="h3 mb-2 text-gray-800">Stock Masuk</h1>
+    <h1 class="h3 mb-2 text-gray-800">Stock Keluar</h1>
     <div class="page-body">
         <div class="container-xl">
             <form method="POST" enctype="multipart/form-data">
@@ -28,7 +28,7 @@ $barang = mysqli_query($conn, "SELECT * FROM stock ORDER BY idbarang DESC LIMIT 
                                     </select>
                                 </div>
                                 <div class="mb-3">
-                                    <label for="qty">Jumlah Masuk</label>
+                                    <label for="qty">Jumlah Keluar</label>
                                     <input type="qty" name="qty" class="form-control">
                                 </div>
                                 <div class="mb-3">
@@ -36,7 +36,7 @@ $barang = mysqli_query($conn, "SELECT * FROM stock ORDER BY idbarang DESC LIMIT 
                                     <input type="keterangan" name="keterangan" class="form-control">
                                 </div>
                                 <div class="mb-3 text-end">
-                                    <button type="submit" class="btn btn-primary" name="submit">Masukan</button>
+                                    <button type="submit" class="btn btn-primary" name="submit">Keluarkan</button>
                                 </div>
                             </div>
                         </div>
