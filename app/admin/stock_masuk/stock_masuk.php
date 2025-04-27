@@ -4,7 +4,7 @@ $judul = "Tambah Pengguna";
 include('../layouts/header.php');
 
 
-$barang = mysqli_query($conn, "SELECT * FROM stock ORDER BY idbarang DESC LIMIT 1");
+$barang = mysqli_query($conn, "SELECT * FROM stock ORDER BY idbarang");
 ?>
 <!-- Begin Page Content -->
 <div class="container-fluid">
