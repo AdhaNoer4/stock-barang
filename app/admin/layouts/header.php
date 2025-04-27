@@ -57,7 +57,7 @@
 
             <!-- Nav Item - Data Barang -->
             <li class="nav-item">
-                <a class="nav-link" href="#">
+                <a class="nav-link" href="../data_barang/barang.php">
                     <i class="fas fa-box"></i>
                     <span>Data Barang</span></a>
             </li>
