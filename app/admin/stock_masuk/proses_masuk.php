@@ -29,21 +29,30 @@ if (isset($_POST['submit'])) {
         if (!empty($pesan_kesalahan)) {
             $_SESSION['validasi'] = implode("<br>", $pesan_kesalahan);
         } else {
-            // insert ke tabel stock_masuk
+            // insert ke tabel masuk
             $insert = mysqli_query($conn, "INSERT INTO masuk (idbarang, tanggal, keterangan, qty) VALUES ('$idbarang', NOW() , '$keterangan', '$qty')");
 
             // update ke tabel stock
             $update = mysqli_query($conn, "UPDATE stock SET stock = stock + '$qty' WHERE idbarang = '$idbarang'");
 
+            // insert ke tabel riwayat_stok
+            $insert_riwayat = mysqli_query($conn, "INSERT INTO riwayat_stok (idbarang, id_user, aksi, jumlah, tanggal) VALUES ('$idbarang', '$_SESSION[id_user]', 'masuk', '$qty', NOW())");
+
             if ($insert && $update) {
-                $_SESSION['berhasil'] = "Data berhasil ditambahkan!";
+                $_SESSION['berhasil'] = "Stock berhasil ditambahkan!";
                 header('Location: stock_masuk.php');
                 exit;
+
+                if ($insert_riwayat) {
+                    $_SESSION['berhasil'] = "Riwayat berhasil ditambahkan!";
+                    header('Location: stock_masuk.php');
+                    exit;
+                } else {
+                    $_SESSION['gagal'] = "Riwayat gagal ditambahkan!";
+                }
             } else {
-                $_SESSION['gagal'] = "Data gagal ditambahkan!";
+                $_SESSION['gagal'] = "Stock gagal ditambahkan!";
             }
         }
     }
 }
-
-

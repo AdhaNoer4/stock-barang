@@ -32,15 +32,34 @@ if (isset($_POST['submit'])) {
             // insert ke tabel stock_masuk
             $insert = mysqli_query($conn, "INSERT INTO masuk (idbarang, tanggal, keterangan, qty) VALUES ('$idbarang', NOW() , '$keterangan', '$qty')");
 
+            // Cek stok tersedia
+            $cek = mysqli_query($conn, "SELECT stock FROM stock WHERE idbarang='$idbarang'");
+            $data = mysqli_fetch_assoc($cek);
+            if ($data['stock'] < $qty) {
+                $_SESSION['gagal'] = "Stok tidak mencukupi!";
+                header('Location: stock_keluar.php');
+                exit;
+            }
             // update ke tabel stock
             $update = mysqli_query($conn, "UPDATE stock SET stock = stock - '$qty' WHERE idbarang = '$idbarang'");
 
+            // insert ke tabel riwayat_stok
+            $insert_riwayat = mysqli_query($conn, "INSERT INTO riwayat_stok (idbarang, id_user, aksi, jumlah, tanggal) VALUES ('$idbarang', '$_SESSION[id_user]', 'keluar', '$qty', NOW())");
+
             if ($insert && $update) {
-                $_SESSION['berhasil'] = "Data berhasil ditambahkan!";
+                $_SESSION['berhasil'] = "Stock berhasil dikeluarkan!";
                 header('Location: stock_keluar.php');
                 exit;
+
+                if ($insert_riwayat) {
+                    $_SESSION['berhasil'] = "Riwayat berhasil ditambahkan!";
+                    header('Location: stock_masuk.php');
+                    exit;
+                } else {
+                    $_SESSION['gagal'] = "Riwayat gagal ditambahkan!";
+                }
             } else {
-                $_SESSION['gagal'] = "Data gagal ditambahkan!";
+                $_SESSION['gagal'] = "Stock gagal dikeluarkan!";
             }
         }
     }

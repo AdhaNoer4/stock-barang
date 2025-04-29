@@ -6,11 +6,11 @@ if (!isset($_SESSION["login"])) {
 } else if ($_SESSION["role"] !== "admin") {
     header("Location: ../../auth/login.php?pesan=tolak_akses");
 }
-$judul = "Data Pengguna";
+$judul = "Riwayat";
 include('../layouts/header.php');
 require_once('../../../config.php');
 
-$result = mysqli_query($conn, "SELECT id_user, nama, email, role FROM user");
+$result = mysqli_query($conn, "SELECT rs.*, s.namabarang, u.nama FROM riwayat_stok rs JOIN stock s ON rs.idbarang = s.idbarang JOIN user u ON rs.id_user = u.id_user ORDER BY rs.tanggal DESC");
 
 ?>
 
@@ -18,15 +18,10 @@ $result = mysqli_query($conn, "SELECT id_user, nama, email, role FROM user");
 <!-- Begin Page Content -->
 <div class="container-fluid">
 
-    <!-- Page Heading -->
-    <h1 class="h3 mb-2 text-gray-800">Pengguna</h1>
-    <a href="tambah.php" class="btn btn-primary mb-2">Tambah Data</a>
-
-
     <!-- DataTales Example -->
     <div class="card shadow mb-4">
         <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Data Pengguna</h6>
+            <h6 class="m-0 font-weight-bold text-primary">Riwayat Pengguna</h6>
         </div>
         <div class="card-body">
             <div class="table-responsive">
@@ -34,10 +29,11 @@ $result = mysqli_query($conn, "SELECT id_user, nama, email, role FROM user");
                     <thead>
                         <tr>
                             <th>No.</th>
+                            <th>Tanggal / Jam</th>
                             <th>Nama</th>
-                            <th>E-mail</th>
-                            <th>Role</th>
                             <th>Aksi</th>
+                            <th>Jumlah</th>
+                            <th>User</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -47,16 +43,15 @@ $result = mysqli_query($conn, "SELECT id_user, nama, email, role FROM user");
                             </tr>
                         <?php } else { ?>
                             <?php $no = 1;
-                            while ($user = mysqli_fetch_array($result)) : ?>
+                            while ($riwayat = mysqli_fetch_array($result)) : ?>
                                 <tr class="text-center">
                                     <td><?= $no++ ?></td>
-                                    <td><?= $user['nama']; ?></td>
-                                    <td><?= $user['email']; ?></td>
-                                    <td><?= $user['role'] ?></td>
-                                    <td>
-                                        <a href="edit.php?id=<?= $user['id_user'] ?>" class="btn btn-success"><i class="far fa-edit"></i></a>
-                                        <a href="hapus.php?id=<?= $user['id_user'] ?>" class="btn btn-danger tombol-hapus"><i class="far fa-trash-alt"></i></a>
-                                    </td>
+                                    <td><?= $riwayat['tanggal']; ?></td>
+                                    <td><?= $riwayat['namabarang']; ?></td>
+                                    <td><?= $riwayat['aksi'] ?></td>
+                                    <td><?= $riwayat['jumlah'] ?></td>
+                                    <td><?= $riwayat['nama'] ?></td>
+
                                 </tr>
                             <?php endwhile; ?>
                         <?php } ?>
