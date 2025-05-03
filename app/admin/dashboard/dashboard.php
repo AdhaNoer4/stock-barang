@@ -9,6 +9,26 @@ $judul = "Dashboard";
 include('../layouts/header.php');
 require_once('../../../config.php');
 
+// query untuk menghitung total barang
+$total_barang_query = mysqli_query($conn, "SELECT COUNT(*) AS total_barang FROM stock");
+$total_barang_data = mysqli_fetch_assoc($total_barang_query);
+$total_barang = $total_barang_data['total_barang'];
+
+// query untuk menghitung total stock menipis
+$total_stock_menipis_query = mysqli_query($conn, "SELECT COUNT(*) AS total_stock_menipis FROM stock WHERE stock <= 5");
+$total_stock_menipis_data = mysqli_fetch_assoc($total_stock_menipis_query);
+$total_stock_menipis = $total_stock_menipis_data['total_stock_menipis'];
+
+// query untuk menghitung total re-stock
+$total_restock_query = mysqli_query($conn, "SELECT COUNT(*) AS total_restock FROM masuk");
+$total_restock_data = mysqli_fetch_assoc($total_restock_query);
+$total_restock = $total_restock_data['total_restock'];
+
+// query untuk menghitung total Aktivitas
+$total_aktivitas_query = mysqli_query($conn, "SELECT COUNT(*) AS total_aktivitas FROM riwayat_stok WHERE aksi = 'masuk' OR aksi = 'keluar'");
+$total_aktivitas_data = mysqli_fetch_assoc($total_aktivitas_query);
+$total_aktivitas = $total_aktivitas_data['total_aktivitas'];
+
 ?>
 <!-- Begin Page Content -->
 <div class="container-fluid">
@@ -31,7 +51,7 @@ require_once('../../../config.php');
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
                                 Total Barang</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">0</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800"><?= $total_barang ?></div>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-box fa-2x text-gray-300"></i>
@@ -49,7 +69,7 @@ require_once('../../../config.php');
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
                                 Stock Menipis</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">0</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800"><?= $total_stock_menipis ?></div>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-minus-square fa-2x text-gray-300"></i>
@@ -69,7 +89,7 @@ require_once('../../../config.php');
                             </div>
                             <div class="row no-gutters align-items-center">
                                 <div class="col-auto">
-                                    <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">0</div>
+                                    <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800"><?= $total_restock ?></div>
                                 </div>
 
                             </div>
@@ -90,7 +110,7 @@ require_once('../../../config.php');
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
                                 Aktivitas</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">0</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800"><?= $total_aktivitas ?></div>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-comments fa-2x text-gray-300"></i>

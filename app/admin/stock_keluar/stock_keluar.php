@@ -32,8 +32,8 @@ $result = mysqli_query($conn, "SELECT rs.*, s.namabarang, u.nama FROM riwayat_st
                                     <input type="qty" name="qty" class="form-control">
                                 </div>
                                 <div class="mb-3">
-                                    <label for="keterangan">Keterangan</label>
-                                    <input type="keterangan" name="keterangan" class="form-control">
+                                    <label for="penerima">Penerima</label>
+                                    <input type="penerima" name="penerima" class="form-control">
                                 </div>
                                 <div class="mb-3 text-end">
                                     <button type="submit" class="btn btn-primary" name="submit">Keluarkan</button>
