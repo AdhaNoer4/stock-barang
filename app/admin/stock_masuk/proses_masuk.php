@@ -36,7 +36,7 @@ if (isset($_POST['submit'])) {
             $update = mysqli_query($conn, "UPDATE stock SET stock = stock + '$qty' WHERE idbarang = '$idbarang'");
 
             // insert ke tabel riwayat_stok
-            $insert_riwayat = mysqli_query($conn, "INSERT INTO riwayat_stok (idbarang, id_user, aksi, jumlah, tanggal) VALUES ('$idbarang', '$_SESSION[id_user]', 'masuk', '$qty', NOW())");
+            $insert_riwayat = mysqli_query($conn, "INSERT INTO riwayat_stok (idbarang, id_user, jenis, jumlah, tanggal) VALUES ('$idbarang', '$_SESSION[id_user]', 'masuk', '$qty', NOW())");
 
             if ($insert && $update) {
                 $_SESSION['berhasil'] = "Stock berhasil ditambahkan!";

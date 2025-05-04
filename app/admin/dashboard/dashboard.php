@@ -25,7 +25,7 @@ $total_restock_data = mysqli_fetch_assoc($total_restock_query);
 $total_restock = $total_restock_data['total_restock'];
 
 // query untuk menghitung total Aktivitas
-$total_aktivitas_query = mysqli_query($conn, "SELECT COUNT(*) AS total_aktivitas FROM riwayat_stok WHERE aksi = 'masuk' OR aksi = 'keluar'");
+$total_aktivitas_query = mysqli_query($conn, "SELECT COUNT(*) AS total_aktivitas FROM riwayat_stok WHERE jenis = 'masuk' OR jenis = 'keluar'");
 $total_aktivitas_data = mysqli_fetch_assoc($total_aktivitas_query);
 $total_aktivitas = $total_aktivitas_data['total_aktivitas'];
 

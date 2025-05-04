@@ -87,7 +87,7 @@
 
             <!-- Nav Item - Laporan -->
             <li class="nav-item">
-                <a class="nav-link" href="#">
+                <a class="nav-link" href="../laporan/laporan.php">
                     <i class="fas fa-file-invoice"></i>
                     <span>Laporan</span></a>
             </li>

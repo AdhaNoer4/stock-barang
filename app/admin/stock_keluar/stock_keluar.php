@@ -4,7 +4,7 @@ $judul = "Tambah Pengguna";
 include('../layouts/header.php');
 
 $barang = mysqli_query($conn, "SELECT * FROM stock ORDER BY idbarang");
-$result = mysqli_query($conn, "SELECT rs.*, s.namabarang, u.nama FROM riwayat_stok rs JOIN stock s ON rs.idbarang = s.idbarang JOIN user u ON rs.id_user = u.id_user WHERE aksi = 'keluar' ORDER BY rs.tanggal DESC");
+$result = mysqli_query($conn, "SELECT rs.*, s.namabarang, u.nama FROM riwayat_stok rs JOIN stock s ON rs.idbarang = s.idbarang JOIN user u ON rs.id_user = u.id_user WHERE jenis = 'keluar' ORDER BY rs.tanggal DESC");
 ?>
 <!-- Begin Page Content -->
 <div class="container-fluid">
