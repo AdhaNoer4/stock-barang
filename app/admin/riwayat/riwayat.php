@@ -31,7 +31,7 @@ $result = mysqli_query($conn, "SELECT rs.*, s.namabarang, u.nama FROM riwayat_st
                             <th>No.</th>
                             <th>Tanggal / Jam</th>
                             <th>Nama</th>
-                            <th>Aksi</th>
+                            <th>Jenis</th>
                             <th>Jumlah</th>
                             <th>User</th>
                         </tr>
@@ -48,7 +48,7 @@ $result = mysqli_query($conn, "SELECT rs.*, s.namabarang, u.nama FROM riwayat_st
                                     <td><?= $no++ ?></td>
                                     <td><?= $riwayat['tanggal']; ?></td>
                                     <td><?= $riwayat['namabarang']; ?></td>
-                                    <td><?= $riwayat['aksi'] ?></td>
+                                    <td><?= $riwayat['jenis'] ?></td>
                                     <td><?= $riwayat['jumlah'] ?></td>
                                     <td><?= $riwayat['nama'] ?></td>
 
