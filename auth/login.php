@@ -116,9 +116,7 @@ if (isset($_POST['login'])) {
 
                                     </form>
                                     <hr>
-                                    <div class="text-center">
-                                        <a class="small" href="#">Forgot Password?</a>
-                                    </div>
+                                    
                                 </div>
                             </div>
                         </div>
