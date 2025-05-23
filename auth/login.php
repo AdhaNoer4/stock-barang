@@ -41,6 +41,10 @@ if (isset($_POST['login'])) {
         $_SESSION["gagal"] = "Email tidak terdaftar!";
     }
 }
+
+$pengaturan = mysqli_query($conn, "SELECT * FROM pengaturan LIMIT 1");
+$setting = mysqli_fetch_assoc($pengaturan);
+$tema = $setting['tema_bootstrap'];
 ?>
 
 <!DOCTYPE html>
@@ -67,7 +71,7 @@ if (isset($_POST['login'])) {
 
 </head>
 
-<body class="bg-gradient-success">
+<body class="bg-gradient-<?= $tema ?>">
 
     <div class="container">
 
@@ -81,7 +85,12 @@ if (isset($_POST['login'])) {
                         <!-- Nested Row within Card Body -->
                         <div class="row">
                             <div class="col-lg-6 d-none d-lg-block bg-login-image">
-                                <img src="../assets/img/logo-stock.png" alt="Logo Stock-Manager">
+                                <?php if ($setting['logo']) : ?>
+                                    <img src="../assets/img/<?= $setting['logo'] ?>" alt="Logo">
+                                <?php else : ?>
+                                    <img src="../assets/img/logo-stock.png" alt="Logo Stock-Manager">
+                                <?php endif; ?>
+
                             </div>
                             <div class="col-lg-6">
                                 <div class="p-5">
