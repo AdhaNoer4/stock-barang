@@ -10,7 +10,15 @@ $judul = "Data Pengguna";
 include('../layouts/header.php');
 require_once('../../../config.php');
 
-$result = mysqli_query($conn, "SELECT id_user, nama, email, role FROM user");
+$result = mysqli_query($conn, "SELECT 
+    user.id_user,
+    user.nama,
+    user.email,
+    user.role,
+    toko.nama_toko
+FROM user
+LEFT JOIN toko ON user.id_toko = toko.id_toko;
+");
 
 ?>
 
@@ -37,6 +45,7 @@ $result = mysqli_query($conn, "SELECT id_user, nama, email, role FROM user");
                             <th>Nama</th>
                             <th>E-mail</th>
                             <th>Role</th>
+                            <th>Toko</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
@@ -53,6 +62,7 @@ $result = mysqli_query($conn, "SELECT id_user, nama, email, role FROM user");
                                     <td><?= $user['nama']; ?></td>
                                     <td><?= $user['email']; ?></td>
                                     <td><?= $user['role'] ?></td>
+                                    <td><?= $user['nama_toko'] ?></td>
                                     <td>
                                         <a href="edit.php?id=<?= $user['id_user'] ?>" class="btn btn-success"><i class="far fa-edit"></i></a>
                                         <a href="hapus.php?id=<?= $user['id_user'] ?>" class="btn btn-danger tombol-hapus"><i class="far fa-trash-alt"></i></a>

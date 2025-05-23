@@ -26,6 +26,7 @@ if (isset($_POST['login'])) {
             $_SESSION['nama'] = $row['nama'];
             $_SESSION['role'] = $row['role'];
             $_SESSION['id_user'] = $row['id_user'];
+            $_SESSION['id_toko'] = $row['id_toko'];
 
             if ($row['role'] == 'admin') {
                 header('Location: ../app/admin/dashboard/dashboard.php');
@@ -116,7 +117,7 @@ if (isset($_POST['login'])) {
 
                                     </form>
                                     <hr>
-                                    
+
                                 </div>
                             </div>
                         </div>

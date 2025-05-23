@@ -23,6 +23,7 @@ if (isset($_POST['submit'])) {
     $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
     $role = htmlspecialchars($_POST['role']);
     $email = htmlspecialchars($_POST['email']);
+    $id_toko = htmlspecialchars($_POST['id_toko']);
 
 
     $icon_validasi = "<svg  xmlns='http://www.w3.org/2000/svg'  width='24'  height='24'  viewBox='0 0 24 24'  fill='none'  stroke='currentColor'  stroke-width='2'  stroke-linecap='round'  stroke-linejoin='round'  class='icon icon-tabler icons-tabler-outline icon-tabler-check'><path stroke='none' d='M0 0h24v24H0z' fill='none'/><path d='M5 12l5 5l10 -10' /></svg>";
@@ -40,6 +41,9 @@ if (isset($_POST['submit'])) {
         if (empty($email)) {
             $pesan_kesalahan[] = "$icon_validasi E-mail wajib diisi!";
         }
+        if (empty($id_toko)) {
+            $pesan_kesalahan[] = "$icon_validasi Toko wajib diisi!";
+        }
         if ($_POST['password'] !== $_POST['ulangi_password']) {
             $pesan_kesalahan[] = "$icon_validasi Password tidak cocok!";
         }
@@ -47,11 +51,27 @@ if (isset($_POST['submit'])) {
         if (!empty($pesan_kesalahan)) {
             $_SESSION['validasi'] = implode("<br>", $pesan_kesalahan);
         } else {
-            $users = mysqli_query($conn, "INSERT INTO user( nama, email, password, role) VALUES ('$nama','$email','$password','$role')");
+            mysqli_begin_transaction($conn);
 
-            $_SESSION['berhasil'] = "Data berhasil ditambahkan!";
-            header('Location: user.php');
-            exit;
+            try {
+                // Insert ke tabel user
+                $stmtUser = mysqli_prepare($conn, "INSERT INTO user (nama, email, password, role, id_toko) VALUES (?, ?, ?, ?, ?)");
+                mysqli_stmt_bind_param($stmtUser, "ssssi", $nama, $email, $password, $role, $id_toko);
+                mysqli_stmt_execute($stmtUser);
+
+                // Commit transaksi jika semua berhasil
+                mysqli_commit($conn);
+
+                $_SESSION['berhasil'] = "Data berhasil ditambahkan!";
+                header('Location: user.php');
+                exit;
+            } catch (Exception $e) {
+                // Rollback jika terjadi kesalahan
+                mysqli_rollback($conn);
+                $_SESSION['gagal'] = "Data gagal ditambahkan! Terjadi kesalahan:" . $e->getMessage();
+                header('Location: user.php');
+                exit;
+            }
         }
     }
 }
@@ -82,6 +102,16 @@ if (isset($_POST['submit'])) {
                                     <option <?php if (isset($_POST['role']) && $_POST['role'] == 'karyawan') {
                                                 echo 'selected';
                                             } ?> value="karyawan">Karyawan</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="nama_toko">Nama Toko</label>
+                                <select name="id_toko" id="id_toko" class="form-control" required>
+                                    <option value="">-- Pilih Toko --</option>
+                                    <?php $query_toko = mysqli_query($conn, "SELECT id_toko, nama_toko FROM toko");
+                                    while ($row = mysqli_fetch_assoc($query_toko)) : ?>
+                                        <option <?php if (isset($_POST['nama_toko'])) echo $_POST['nama_toko'] ?> value="<?= $row['id_toko']; ?>"><?= $row['nama_toko']; ?></option>
+                                    <?php endwhile; ?>
                                 </select>
                             </div>
                         </div>
