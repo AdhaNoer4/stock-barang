@@ -12,24 +12,42 @@ require_once('../../../config.php');
 
 if (isset($_POST['submit'])) {
 
-    $namabarang = htmlspecialchars($_POST['namabarang']);
-    $deskripsi = htmlspecialchars($_POST['deskripsi']);
-    $stock = intval($_POST['stock']);
+    $kodebarang = htmlspecialchars($_POST['kode_barang']);
+    $namabarang = htmlspecialchars($_POST['nama_barang']);
+    $hargapokok = intval($_POST['harga_pokok']);
+    $hargajual = intval($_POST['harga_jual']);
+    $stocktotal = intval($_POST['stock_total']);
+    $minimalstock = intval($_POST['minimal_stock']);
 
     $icon_validasi = "<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='icon icon-tabler icons-tabler-outline icon-tabler-check'><path stroke='none' d='M0 0h24v24H0z' fill='none'/><path d='M5 12l5 5l10 -10' /></svg>";
 
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+        if (empty($kodebarang)) {
+            $pesan_kesalahan[] = "$icon_validasi Kode barang wajib diisi!";
+        }
         if (empty($namabarang)) {
             $pesan_kesalahan[] = "$icon_validasi Nama barang wajib diisi!";
         }
-        if (empty($stock) && $stock !== 0) {
-            $pesan_kesalahan[] = "$icon_validasi stock barang wajib diisi!";
+        if (empty($hargapokok) && $hargapokok !== 0) {
+            $pesan_kesalahan[] = "$icon_validasi harga pokok barang wajib diisi!";
         }
+        if (empty($hargajual) && $hargajual !== 0) {
+            $pesan_kesalahan[] = "$icon_validasi harga jual barang wajib diisi!";
+        }
+        if (empty($stocktotal) && $stocktotal !== 0) {
+            $pesan_kesalahan[] = "$icon_validasi stock total barang wajib diisi!";
+        }
+        if (empty($minimalstock) && $minimalstock !== 0) {
+            $pesan_kesalahan[] = "$icon_validasi minimal stock barang wajib diisi!";
+        }
+
+
 
         if (!empty($pesan_kesalahan)) {
             $_SESSION['validasi'] = implode("<br>", $pesan_kesalahan);
         } else {
-            $query = mysqli_query($conn, "INSERT INTO stock (namabarang, deskripsi, stock) VALUES ('$namabarang', '$deskripsi', $stock)");
+            $query = mysqli_query($conn, "INSERT INTO barang (kode_barang, nama_barang, harga_pokok, harga_jual, stock_total, minimal_stock) VALUES ('$kodebarang', '$namabarang', '$hargapokok','$hargajual','$stocktotal', $minimalstock)");
 
             $_SESSION['berhasil'] = "Barang berhasil ditambahkan!";
             header('Location: barang.php');
@@ -46,17 +64,28 @@ if (isset($_POST['submit'])) {
                 <div class="col-md-6">
                     <div class="card">
                         <div class="card-body">
+                             <div class="mb-3">
+                                <label for="kode_barang">Kode Barang</label>
+                                <input type="text" name="kode_barang" class="form-control" value="<?php if (isset($_POST['kode_barang'])) echo $_POST['kode_barang'] ?>">
                             <div class="mb-3">
-                                <label for="namabarang">Nama Barang</label>
-                                <input type="text" name="namabarang" class="form-control" value="<?php if (isset($_POST['namabarang'])) echo $_POST['namabarang'] ?>">
+                                <label for="nama_barang">Nama Barang</label>
+                                <input type="text" name="nama_barang" class="form-control" value="<?php if (isset($_POST['nama_barang'])) echo $_POST['nama_barang'] ?>">
                             </div>
                             <div class="mb-3">
-                                <label for="deskripsi">Deskripsi</label>
-                                <textarea name="deskripsi" class="form-control"><?php if (isset($_POST['deskripsi'])) echo $_POST['deskripsi'] ?></textarea>
+                                <label for="harga_pokok">Harga Pokok</label>
+                                <input type="number" name="harga_pokok" class="form-control" value="<?php if (isset($_POST['harga_pokok'])) echo $_POST['harga_pokok'] ?>">
                             </div>
                             <div class="mb-3">
-                                <label for="stock">Stock</label>
-                                <input type="number" name="stock" class="form-control" value="<?php if (isset($_POST['stock'])) echo $_POST['stock'] ?>">
+                                <label for="harga_jual">Harga Jual</label>
+                                <input type="number" name="harga_jual" class="form-control" value="<?php if (isset($_POST['harga_jual'])) echo $_POST['harga_jual'] ?>">
+                            </div>
+                            <div class="mb-3">
+                                <label for="stock_total">Stock Total</label>
+                                <input type="number" name="stock_total" class="form-control" value="<?php if (isset($_POST['stock_total'])) echo $_POST['stock_total'] ?>">
+                            </div>
+                            <div class="mb-3">
+                                <label for="minimal_stock">Minimal Stock</label>
+                                <input type="number" name="minimal_stock" class="form-control" value="<?php if (isset($_POST['minimal_stock'])) echo $_POST['minimal_stock'] ?>">
                             </div>
                             <div class="mb-3 text-end">
                                 <button type="submit" class="btn btn-primary" name="submit">Simpan</button>
