@@ -6,7 +6,7 @@ if (!isset($_SESSION["login"])) {
 } else if ($_SESSION["role"] !== "admin") {
     header("Location: ../../auth/login.php?pesan=tolak_akses");
 }
-$judul = "Data Pengguna";
+$judul = "Pengguna";
 include('../layouts/header.php');
 require_once('../../../config.php');
 
@@ -27,7 +27,7 @@ LEFT JOIN toko ON user.id_toko = toko.id_toko;
 <div class="container-fluid">
 
     <!-- Page Heading -->
-    <h1 class="h3 mb-2 text-gray-800">Pengguna</h1>
+    <h1 class="h3 mb-2 text-gray-800"><?= $judul ?></h1>
     <a href="tambah.php" class="btn btn-primary mb-2">Tambah Data</a>
 
 

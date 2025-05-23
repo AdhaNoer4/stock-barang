@@ -32,8 +32,13 @@ if (isset($_POST['submit'])) {
         if (empty($nama)) {
             $pesan_kesalahan[] = "$icon_validasi Nama  wajib diisi!";
         }
-        if (empty($password)) {
-            $pesan_kesalahan[] = "$icon_validasi Password wajib diisi!";
+        if (!empty(trim($_POST['password']))) {
+            if ($_POST['password'] !== $_POST['ulangi_password']) {
+                $pesan_kesalahan[] = "$icon_validasi Password tidak cocok!";
+            }
+            if (strlen($_POST['password']) < 6) {
+                $pesan_kesalahan[] = "$icon_validasi Password minimal 6 karakter!";
+            }
         }
         if (empty($role)) {
             $pesan_kesalahan[] = "$icon_validasi Role wajib diisi!";
@@ -43,9 +48,6 @@ if (isset($_POST['submit'])) {
         }
         if (empty($id_toko)) {
             $pesan_kesalahan[] = "$icon_validasi Toko wajib diisi!";
-        }
-        if ($_POST['password'] !== $_POST['ulangi_password']) {
-            $pesan_kesalahan[] = "$icon_validasi Password tidak cocok!";
         }
 
         if (!empty($pesan_kesalahan)) {
@@ -79,10 +81,11 @@ if (isset($_POST['submit'])) {
 
 <div class="page-body">
     <div class="container-xl">
+        <h1 class="h3 mb-2 text-gray-800"><?= $judul ?></h1>
         <form action="tambah.php" method="POST" enctype="multipart/form-data">
             <div class="row">
                 <div class="col-md-6">
-                    <div class="card">
+                    <div class="card mb-5">
                         <div class="card-body">
                             <div class="mb-3">
                                 <label for="nama">Nama</label>
@@ -105,7 +108,7 @@ if (isset($_POST['submit'])) {
                                 </select>
                             </div>
                             <div class="mb-3">
-                                <label for="nama_toko">Nama Toko</label>
+                                <label for="id_toko">Nama Toko</label>
                                 <select name="id_toko" id="id_toko" class="form-control" required>
                                     <option value="">-- Pilih Toko --</option>
                                     <?php $query_toko = mysqli_query($conn, "SELECT id_toko, nama_toko FROM toko");
@@ -123,7 +126,7 @@ if (isset($_POST['submit'])) {
 
                             <div class="mb-3">
                                 <label for="password">Password</label>
-                                <input type="password" name="password" class="form-control">
+                                <input type="password" name="password" class="form-control" placeholder="minimal 6 karakter">
                             </div>
                             <div class="mb-3">
                                 <label for="ulangi_password">Ulangi Password</label>
