@@ -9,7 +9,7 @@ $judul = "Data Barang";
 include('../layouts/header.php');
 require_once('../../../config.php');
 
-$result = mysqli_query($conn, "SELECT idbarang, namabarang, deskripsi, stock FROM stock");
+$result = mysqli_query($conn, "SELECT id_barang, kode_barang, nama_barang, harga_pokok, harga_jual, stock_total, minimal_stock FROM barang");
 
 ?>
 
@@ -33,28 +33,34 @@ $result = mysqli_query($conn, "SELECT idbarang, namabarang, deskripsi, stock FRO
                     <thead>
                         <tr>
                             <th>No.</th>
+                            <th>Kode Barang</th>
                             <th>Nama</th>
-                            <th>Deskripsi</th>
+                            <th>Harga Pokok</th>
+                            <th>Harga Jual</th>
                             <th>Stock</th>
+                            <th>Minimal Stock</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php if (mysqli_num_rows($result) === 0) { ?>
                             <tr>
-                                <td colspan="5">Data kosong, Silahkan tambah data baru</td>
+                                <td colspan="8">Data kosong, Silahkan tambah data baru</td>
                             </tr>
                         <?php } else { ?>
                             <?php $no = 1;
                             while ($stock = mysqli_fetch_array($result)) : ?>
                                 <tr class="text-center">
                                     <td><?= $no++ ?></td>
-                                    <td><?= $stock['namabarang']; ?></td>
-                                    <td><?= $stock['deskripsi']; ?></td>
-                                    <td><?= $stock['stock'] ?></td>
+                                    <td><?= $stock['kode_barang']; ?></td>
+                                    <td><?= $stock['nama_barang']; ?></td>
+                                    <td><?= $stock['harga_pokok']; ?></td>
+                                    <td><?= $stock['harga_jual'] ?></td>
+                                    <td><?= $stock['stock_total'] ?></td>
+                                    <td><?= $stock['minimal_stock'] ?></td>
                                     <td>
-                                        <a href="edit_barang.php?id=<?= $stock['idbarang'] ?>" class="btn btn-success"><i class="far fa-edit"></i></a>
-                                        <a href="hapus_barang.php?id=<?= $stock['idbarang'] ?>" class="btn btn-danger tombol-hapus"><i class="far fa-trash-alt"></i></a>
+                                        <a href="edit_barang.php?id=<?= $stock['id_barang'] ?>" class="btn btn-success"><i class="far fa-edit"></i></a>
+                                        <a href="hapus_barang.php?id=<?= $stock['id_barang'] ?>" class="btn btn-danger tombol-hapus"><i class="far fa-trash-alt"></i></a>
                                     </td>
                                 </tr>
                             <?php endwhile; ?>
