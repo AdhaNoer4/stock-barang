@@ -84,6 +84,12 @@
                     <i class="fas fa-user-circle"></i>
                     <span>Pengguna</span></a>
             </li>
+            <!-- Nav Item - Toko -->
+            <li class="nav-item">
+                <a class="nav-link" href="../toko/toko.php">
+                    <i class="fas fa-store-alt"></i>
+                    <span>Toko</span></a>
+            </li>
 
             <!-- Nav Item - Laporan -->
             <li class="nav-item">
