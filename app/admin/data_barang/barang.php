@@ -9,8 +9,10 @@ $judul = "Data Barang";
 include('../layouts/header.php');
 require_once('../../../config.php');
 
-$result = mysqli_query($conn, "SELECT barang.id_barang, barang.kode_barang, barang.nama_barang, barang.harga_pokok, barang.harga_jual, barang.minimal_stock, stock.stock FROM barang LEFT JOIN 
-    stock ON barang.id_stock = stock.id_stock;");
+
+
+$result = mysqli_query($conn, "SELECT barang.id_barang, barang.kode_barang, barang.nama_barang, barang.harga_pokok, barang.harga_jual, barang.minimal_stock, barang.id_toko, stock.stock  FROM barang LEFT JOIN 
+    stock ON barang.id_barang = stock.id_barang ");
 
 ?>
 
