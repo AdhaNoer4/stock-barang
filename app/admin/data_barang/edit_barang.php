@@ -52,7 +52,15 @@ if (isset($_POST['submit'])) {
         if (!empty($pesan_kesalahan)) {
             $_SESSION['validasi'] = implode("<br>", $pesan_kesalahan);
         } else {
-            $update = mysqli_query($conn, "UPDATE barang SET kode_barang='$kodebarang', nama_barang='$namabarang', harga_pokok='$hargapokok', harga_jual='$hargajual', stock_total=$stocktotal, minimal_stock=$minimalstock WHERE id_barang=$idbarang");
+            $update_stock = mysqli_query($conn, "UPDATE stock SET stock = $stocktotal WHERE id_barang = $idbarang");
+
+            $update = mysqli_query($conn, "UPDATE barang SET 
+            kode_barang = '$kodebarang', 
+            nama_barang = '$namabarang', 
+            harga_pokok = $hargapokok, 
+            harga_jual = $hargajual, 
+            minimal_stock = $minimalstock 
+            WHERE id_barang = $idbarang");
 
             if ($update) {
                 $_SESSION['berhasil'] = "Barang berhasil diupdate!";
@@ -92,7 +100,7 @@ if (isset($_POST['submit'])) {
                             </div>
                             <div class="mb-3">
                                 <label for="stock_total">Stock Total</label>
-                                <input type="number" name="stock_total" class="form-control" value="<?= $barang['stock_total']; ?>">
+                                <input type="number" name="stock_total" class="form-control" value="<?= $barang['id_stock']; ?>">
                             </div>
                             <div class="mb-3">
                                 <label for="minimal_stock">Minimal Stock</label>

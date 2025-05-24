@@ -9,7 +9,8 @@ $judul = "Data Barang";
 include('../layouts/header.php');
 require_once('../../../config.php');
 
-$result = mysqli_query($conn, "SELECT id_barang, kode_barang, nama_barang, harga_pokok, harga_jual, stock_total, minimal_stock FROM barang");
+$result = mysqli_query($conn, "SELECT barang.id_barang, barang.kode_barang, barang.nama_barang, barang.harga_pokok, barang.harga_jual, barang.minimal_stock, stock.stock FROM barang LEFT JOIN 
+    stock ON barang.id_stock = stock.id_stock;");
 
 ?>
 
@@ -37,8 +38,8 @@ $result = mysqli_query($conn, "SELECT id_barang, kode_barang, nama_barang, harga
                             <th>Nama</th>
                             <th>Harga Pokok</th>
                             <th>Harga Jual</th>
-                            <th>Stock</th>
                             <th>Minimal Stock</th>
+                            <th>Stock</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
@@ -56,8 +57,8 @@ $result = mysqli_query($conn, "SELECT id_barang, kode_barang, nama_barang, harga
                                     <td><?= $stock['nama_barang']; ?></td>
                                     <td><?= $stock['harga_pokok']; ?></td>
                                     <td><?= $stock['harga_jual'] ?></td>
-                                    <td><?= $stock['stock_total'] ?></td>
                                     <td><?= $stock['minimal_stock'] ?></td>
+                                    <td><?= $stock['stock'] ?></td>
                                     <td>
                                         <a href="edit_barang.php?id=<?= $stock['id_barang'] ?>" class="btn btn-success"><i class="far fa-edit"></i></a>
                                         <a href="hapus_barang.php?id=<?= $stock['id_barang'] ?>" class="btn btn-danger tombol-hapus"><i class="far fa-trash-alt"></i></a>
