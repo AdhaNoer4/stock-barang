@@ -15,7 +15,10 @@ $total_barang_data = mysqli_fetch_assoc($total_barang_query);
 $total_barang = $total_barang_data['total_barang'];
 
 // query untuk menghitung total stock menipis
-$total_stock_menipis_query = mysqli_query($conn, "SELECT COUNT(*) AS total_stock_menipis FROM stock WHERE stock <= 5");
+$minimal_stock_query = mysqli_query($conn, "SELECT minimal_stock FROM barang");
+$minimal_stock_data = mysqli_fetch_assoc($minimal_stock_query);
+$minimal_stock = $minimal_stock_data['minimal_stock'];
+$total_stock_menipis_query = mysqli_query($conn, "SELECT COUNT(*) AS total_stock_menipis FROM stock WHERE stock <= $minimal_stock");
 $total_stock_menipis_data = mysqli_fetch_assoc($total_stock_menipis_query);
 $total_stock_menipis = $total_stock_menipis_data['total_stock_menipis'];
 

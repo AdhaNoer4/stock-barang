@@ -9,19 +9,24 @@ if (!isset($_SESSION["login"])) {
 require_once('../../../config.php');
 
 if (isset($_POST['submit'])) {
-    $idbarang = htmlspecialchars($_POST['idbarang']);
-    $qty = htmlspecialchars($_POST['qty']);
+    $id_barang = htmlspecialchars($_POST['id_barang']);
+    $id_stock = htmlspecialchars($_POST['id_stock']);
+    $jumlah = htmlspecialchars($_POST['jumlah']);
     $penerima = htmlspecialchars($_POST['penerima']);
+    $tanggal = htmlspecialchars($_POST['tanggal']);
+    $id_toko = $_SESSION['id_toko'];
+    $id_user = $_SESSION['id_user'];
 
     $icon_validasi = "<svg  xmlns='http://www.w3.org/2000/svg'  width='24'  height='24'  viewBox='0 0 24 24'  fill='none'  stroke='currentColor'  stroke-width='2'  stroke-linecap='round'  stroke-linejoin='round'  class='icon icon-tabler icons-tabler-outline icon-tabler-check'><path stroke='none' d='M0 0h24v24H0z' fill='none'/><path d='M5 12l5 5l10 -10' /></svg>";
 
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $pesan_kesalahan = [];
         // Validasi inputan
-        if (empty($idbarang)) {
+        if (empty($id_barang)) {
             $pesan_kesalahan[] = "$icon_validasi Nama Barang wajib diisi!";
         }
-        if (empty($qty)) {
-            $pesan_kesalahan[] = "$icon_validasi Jumlah Masuk wajib diisi!";
+        if (empty($jumlah)) {
+            $pesan_kesalahan[] = "$icon_validasi Jumlah keluar wajib diisi!";
         }
         if (empty($penerima)) {
             $pesan_kesalahan[] = "$icon_validasi penerima wajib diisi!";
@@ -29,22 +34,30 @@ if (isset($_POST['submit'])) {
         if (!empty($pesan_kesalahan)) {
             $_SESSION['validasi'] = implode("<br>", $pesan_kesalahan);
         } else {
-            // insert ke tabel stock_masuk
-            $insert = mysqli_query($conn, "INSERT INTO keluar (idbarang, tanggal, penerima, qty) VALUES ('$idbarang', NOW() , '$penerima', '$qty')");
+            // Ambil stok saat ini
+            $query = mysqli_query($conn, "SELECT stock FROM stock WHERE id_barang = $id_barang");
+            $data = mysqli_fetch_assoc($query);
+            $stok_sekarang = $data['stock'];
 
-            // Cek stok tersedia
-            $cek = mysqli_query($conn, "SELECT stock FROM stock WHERE idbarang='$idbarang'");
-            $data = mysqli_fetch_assoc($cek);
-            if ($data['stock'] < $qty) {
-                $_SESSION['gagal'] = "Stok tidak mencukupi!";
+            // Validasi jumlah keluar
+            if ($jumlah > $stok_sekarang) {
+                $_SESSION['gagal'] = "Jumlah Stok Tidak Mencukupi. Silahkan Tambah Stok terlebih dahulu!";
                 header('Location: stock_keluar.php');
                 exit;
             }
+            if ($jumlah <= 0) {
+                $_SESSION['gagal'] = "Jumlah keluar harus lebih dari 0!";
+                header('Location: stock_keluar.php');
+                exit;
+            }
+            // insert ke tabel keluar
+            $insert = mysqli_query($conn, "INSERT INTO keluar (id_barang, tanggal, penerima, jumlah, id_user, id_toko) VALUES ('$id_barang', '$tanggal' , '$penerima', '$jumlah', '$id_user', '$id_toko')");
+
             // update ke tabel stock
-            $update = mysqli_query($conn, "UPDATE stock SET stock = stock - '$qty' WHERE idbarang = '$idbarang'");
+            $update = mysqli_query($conn, "UPDATE stock SET stock = stock - '$jumlah', id_toko = '$id_toko'  WHERE id_barang = '$id_barang'");
 
             // insert ke tabel riwayat_stok
-            $insert_riwayat = mysqli_query($conn, "INSERT INTO riwayat_stok (idbarang, id_user, jenis, jumlah, tanggal) VALUES ('$idbarang', '$_SESSION[id_user]', 'keluar', '$qty', NOW())");
+            $insert_riwayat = mysqli_query($conn, "INSERT INTO riwayat_stok (id_barang, jumlah, tanggal, id_user, id_toko, jenis) VALUES ('$id_barang', '$jumlah', '$tanggal', '$id_user', '$id_toko', 'keluar')");
 
             if ($insert && $update) {
                 $_SESSION['berhasil'] = "Stock berhasil dikeluarkan!";
@@ -53,7 +66,7 @@ if (isset($_POST['submit'])) {
 
                 if ($insert_riwayat) {
                     $_SESSION['berhasil'] = "Riwayat berhasil ditambahkan!";
-                    header('Location: stock_masuk.php');
+                    header('Location: stock_keluar.php');
                     exit;
                 } else {
                     $_SESSION['gagal'] = "Riwayat gagal ditambahkan!";

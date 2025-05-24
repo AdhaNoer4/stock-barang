@@ -19,6 +19,8 @@ if (!isset($_GET['id'])) {
 $idbarang = intval($_GET['id']);
 
 $query = mysqli_query($conn, "SELECT * FROM barang WHERE id_barang = $idbarang");
+$query_stock = mysqli_query($conn, "SELECT * FROM stock WHERE id_barang = $idbarang");
+$stock = mysqli_fetch_assoc($query_stock);
 $barang = mysqli_fetch_assoc($query);
 
 if (isset($_POST['submit'])) {
@@ -100,7 +102,7 @@ if (isset($_POST['submit'])) {
                             </div>
                             <div class="mb-3">
                                 <label for="stock_total">Stock Total</label>
-                                <input type="number" name="stock_total" class="form-control" value="<?= $barang['id_stock']; ?>">
+                                <input type="number" name="stock_total" class="form-control" value="<?= $stock['stock']; ?>">
                             </div>
                             <div class="mb-3">
                                 <label for="minimal_stock">Minimal Stock</label>

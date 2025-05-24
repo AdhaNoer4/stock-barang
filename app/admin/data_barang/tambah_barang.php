@@ -47,13 +47,27 @@ if (isset($_POST['submit'])) {
         } else {
             mysqli_begin_transaction($conn);
             try {
+                // insert ke tabel stock
+                $stmtStock = mysqli_prepare($conn, "INSERT INTO stock (stock, id_toko) VALUES (?, ?)");
+                mysqli_stmt_bind_param($stmtStock, "ii", $minimalstock, $id_toko);
+                mysqli_stmt_execute($stmtStock);
+                $id_stock = mysqli_insert_id($conn);
+
 
                 // Insert ke tabel barang
                 $stmtBarang = mysqli_prepare($conn, "INSERT INTO barang 
-                (kode_barang, nama_barang, harga_pokok, harga_jual, laba, minimal_stock, id_toko)
-                VALUES (?, ?, ?, ?, ?, ?,?)");
-                mysqli_stmt_bind_param($stmtBarang, "ssiiiii", $kodebarang, $namabarang, $hargapokok, $hargajual, $laba, $minimalstock, $id_toko);
+                (kode_barang, nama_barang, harga_pokok, harga_jual, laba, minimal_stock, id_toko, id_stock)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+                mysqli_stmt_bind_param($stmtBarang, "ssiiiiii", $kodebarang, $namabarang, $hargapokok, $hargajual, $laba, $minimalstock, $id_toko, $id_stock);
                 mysqli_stmt_execute($stmtBarang);
+                $id_barang_baru = mysqli_insert_id($conn);
+
+                // update id_barang di table stock
+                $stmtUpdateStock = mysqli_prepare($conn, "UPDATE stock SET id_barang = ? WHERE id_stock = ?");
+                mysqli_stmt_bind_param($stmtUpdateStock, "ii", $id_barang_baru, $id_stock);
+                mysqli_stmt_execute($stmtUpdateStock);
+                mysqli_stmt_close($stmtUpdateStock);
+                mysqli_stmt_close($stmtBarang);
 
                 mysqli_commit($conn);
                 $_SESSION['berhasil'] = "Barang berhasil ditambahkan!";

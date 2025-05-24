@@ -1,11 +1,11 @@
 <?php
-require_once('proses_masuk.php');
+require('proses_masuk.php');
 $judul = "Tambah Pengguna";
 include('../layouts/header.php');
 
 
 $barang = mysqli_query($conn, "SELECT nama_barang, id_barang FROM barang WHERE id_toko = '$_SESSION[id_toko]' ORDER BY nama_barang ASC");
-// $result = mysqli_query($conn, "SELECT rs.*, s.id, u.nama FROM riwayat_stok rs JOIN stock s ON rs.idbarang = s.idbarang JOIN user u ON rs.id_user = u.id_user WHERE jenis = 'masuk' ORDER BY rs.tanggal DESC");
+$result = mysqli_query($conn, "SELECT rs.*,s.id_barang, u.nama, b.nama_barang FROM riwayat_stok rs JOIN stock s ON rs.id_barang = s.id_barang JOIN user u ON rs.id_user = u.id_user JOIN barang b ON rs.id_barang = b.id_barang WHERE jenis = 'masuk' AND tanggal = CURDATE() ORDER BY rs.tanggal DESC");
 ?>
 <!-- Begin Page Content -->
 <div class="container-fluid">
@@ -56,7 +56,7 @@ $barang = mysqli_query($conn, "SELECT nama_barang, id_barang FROM barang WHERE i
     <!--Table Riwayat Masuk -->
     <div class="card shadow mb-4 mt-4">
         <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Riwayat Masuk</h6>
+            <h6 class="m-0 font-weight-bold text-primary">Riwayat Masuk Hari Ini</h6>
         </div>
         <div class="card-body">
             <div class="table-responsive">
@@ -64,11 +64,11 @@ $barang = mysqli_query($conn, "SELECT nama_barang, id_barang FROM barang WHERE i
                     <thead>
                         <tr>
                             <th>No.</th>
-                            <th>Tanggal / Jam</th>
-                            <th>Nama</th>
-                            <!-- <th>Aksi</th> -->
+                            <th>Tanggal</th>
+                            <th>Nama Barang</th>
                             <th>Jumlah</th>
                             <th>User</th>
+                            <th>Jenis</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -82,10 +82,10 @@ $barang = mysqli_query($conn, "SELECT nama_barang, id_barang FROM barang WHERE i
                                 <tr class="text-center">
                                     <td><?= $no++ ?></td>
                                     <td><?= $riwayat['tanggal']; ?></td>
-                                    <td><?= $riwayat['namabarang']; ?></td>
-                                    <!-- <td><?= $riwayat['aksi'] ?></td> -->
+                                    <td><?= $riwayat['nama_barang']; ?></td>
                                     <td><?= $riwayat['jumlah'] ?></td>
                                     <td><?= $riwayat['nama'] ?></td>
+                                    <td><?= $riwayat['jenis'] ?></td>
 
                                 </tr>
                             <?php endwhile; ?>
