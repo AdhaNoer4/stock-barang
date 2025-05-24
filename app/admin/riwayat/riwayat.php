@@ -10,7 +10,7 @@ $judul = "Riwayat";
 include('../layouts/header.php');
 require_once('../../../config.php');
 
-$result = mysqli_query($conn, "SELECT rs.*, s.namabarang, u.nama FROM riwayat_stok rs JOIN stock s ON rs.idbarang = s.idbarang JOIN user u ON rs.id_user = u.id_user ORDER BY rs.tanggal DESC");
+$result = mysqli_query($conn, "SELECT rs.*,s.id_barang, u.nama, b.nama_barang FROM riwayat_stok rs JOIN stock s ON rs.id_barang = s.id_barang JOIN user u ON rs.id_user = u.id_user JOIN barang b ON rs.id_barang = b.id_barang WHERE tanggal = CURDATE() ORDER BY rs.tanggal DESC");
 
 ?>
 
@@ -29,17 +29,17 @@ $result = mysqli_query($conn, "SELECT rs.*, s.namabarang, u.nama FROM riwayat_st
                     <thead>
                         <tr>
                             <th>No.</th>
-                            <th>Tanggal / Jam</th>
-                            <th>Nama</th>
-                            <th>Jenis</th>
+                            <th>Tanggal</th>
+                            <th>Nama Barang</th>
                             <th>Jumlah</th>
                             <th>User</th>
+                            <th>Jenis</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php if (mysqli_num_rows($result) === 0) { ?>
                             <tr>
-                                <td colspan="5">Data kosong, Silahkan tambah data baru</td>
+                                <td colspan="6">Data kosong, Silahkan tambah data baru</td>
                             </tr>
                         <?php } else { ?>
                             <?php $no = 1;
@@ -47,10 +47,10 @@ $result = mysqli_query($conn, "SELECT rs.*, s.namabarang, u.nama FROM riwayat_st
                                 <tr class="text-center">
                                     <td><?= $no++ ?></td>
                                     <td><?= $riwayat['tanggal']; ?></td>
-                                    <td><?= $riwayat['namabarang']; ?></td>
-                                    <td><?= $riwayat['jenis'] ?></td>
+                                    <td><?= $riwayat['nama_barang']; ?></td>
                                     <td><?= $riwayat['jumlah'] ?></td>
                                     <td><?= $riwayat['nama'] ?></td>
+                                    <td><?= $riwayat['jenis'] ?></td>
 
                                 </tr>
                             <?php endwhile; ?>
