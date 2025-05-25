@@ -9,11 +9,18 @@ $judul = "Data Barang";
 include('../layouts/header.php');
 require_once('../../../config.php');
 
+$tokoResult = mysqli_query($conn, "SELECT id_toko, nama_toko FROM toko");
+$id_toko_terpilih = isset($_GET['id_toko']) ? intval($_GET['id_toko']) : null;
 
+$query = "SELECT barang.id_barang, barang.kode_barang, barang.nama_barang, barang.harga_pokok, barang.harga_jual, barang.minimal_stock, barang.id_toko, stock.stock  
+FROM barang 
+LEFT JOIN stock ON barang.id_barang = stock.id_barang";
 
-$result = mysqli_query($conn, "SELECT barang.id_barang, barang.kode_barang, barang.nama_barang, barang.harga_pokok, barang.harga_jual, barang.minimal_stock, barang.id_toko, stock.stock  FROM barang LEFT JOIN 
-    stock ON barang.id_barang = stock.id_barang ");
+if ($id_toko_terpilih) {
+    $query .= " WHERE barang.id_toko = $id_toko_terpilih";
+}
 
+$result = mysqli_query($conn, $query);
 ?>
 
 
@@ -29,8 +36,23 @@ $result = mysqli_query($conn, "SELECT barang.id_barang, barang.kode_barang, bara
     <div class="card shadow mb-4">
         <div class="card-header py-3">
             <h6 class="m-0 font-weight-bold text-primary">Data Barang</h6>
-        </div>
+        </div>      
         <div class="card-body">
+            <form method="GET" class="mb-3">
+            <div class="row align-items-end">
+                <div class="col-auto">
+                    <label for="id_toko">Pilih Toko</label>
+                    <select name="id_toko" id="id_toko" class="form-control" onchange="this.form.submit()">
+                        <option value="">-- Semua Toko --</option>
+                        <?php while ($toko = mysqli_fetch_assoc($tokoResult)): ?>
+                            <option value="<?= $toko['id_toko'] ?>" <?= $id_toko_terpilih == $toko['id_toko'] ? 'selected' : '' ?>>
+                                <?= $toko['nama_toko'] ?>
+                            </option>
+                        <?php endwhile; ?>
+                    </select>
+                </div>
+            </div>
+        </form>
             <div class="table-responsive">
                 <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                     <thead>
