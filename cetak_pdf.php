@@ -23,7 +23,7 @@ $sql = "SELECT
             s.id_toko,
             s.stock AS stock_toko
         FROM barang b
-        LEFT JOIN stock s ON b.id_barang = s.id_barang
+        JOIN stock s ON b.id_barang = s.id_barang
         ORDER BY b.id_barang, s.id_toko";
 
 $result = mysqli_query($conn, $sql);
@@ -57,6 +57,24 @@ while ($row = mysqli_fetch_assoc($result)) {
 
     $data[$id_barang]['tanggal'] = $tanggal_input;
 }
+// Ambil perubahan stock dari riwayat_stok untuk jenis 'masuk' pada tanggal yang dipilih
+$sql_riwayat = "SELECT id_barang, SUM(jumlah) AS penambahan
+                FROM riwayat_stok
+                WHERE jenis = 'masuk' AND tanggal = ?
+                GROUP BY id_barang";
+
+$stmt = $conn->prepare($sql_riwayat);
+$stmt->bind_param("s", $tanggal_input);
+$stmt->execute();
+$result_riwayat = $stmt->get_result();
+
+while ($row = $result_riwayat->fetch_assoc()) {
+    $id_barang = $row['id_barang'];
+    if (isset($data[$id_barang])) {
+        $data[$id_barang]['perubahan_stock'] = $row['penambahan'];
+    }
+}
+
 
 
 // Buat tampilan HTML
@@ -83,7 +101,7 @@ $html = '
             <th>Stock Toko 3</th>
             <th>Stock Total</th>
             <th>Minimal Stock</th>
-            <th>Perubahan Stock</th>
+            <th>Penambahan Stock</th>
         </tr>
     </thead>
     <tbody>';

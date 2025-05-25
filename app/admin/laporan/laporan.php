@@ -13,35 +13,33 @@ if (isset($_GET['tanggal'])) {
     $tanggal = $_GET['tanggal'];
 
     $query = "
-        SELECT 
-            r.tanggal, 
-            b.kode_barang, 
-            b.nama_barang, 
-            b.harga_pokok, 
-            b.harga_jual, 
-            b.laba, 
-            b.minimal_stock,
-            b.id_barang,
-            b.id_toko,
-            b.id_stock,
-            r.jumlah,
-            r.jenis,
-            r.id_toko AS toko_riwayat
-        FROM riwayat_stok r
-        JOIN barang b ON r.id_barang = b.id_barang
-        WHERE DATE(r.tanggal) = '$tanggal'
-    ";
+    SELECT 
+        r.tanggal, 
+        b.kode_barang, 
+        b.nama_barang, 
+        b.harga_pokok, 
+        b.harga_jual, 
+        b.laba, 
+        b.minimal_stock,
+        b.id_barang,
+        r.jumlah,
+        r.jenis,
+        
+        s1.stock AS stock_toko_1,
+        s2.stock AS stock_toko_2,
+        s3.stock AS stock_toko_3
+
+    FROM riwayat_stok r
+    JOIN barang b ON r.id_barang = b.id_barang
+    LEFT JOIN stock s1 ON s1.id_barang = b.id_barang AND s1.id_toko = 1
+    LEFT JOIN stock s2 ON s2.id_barang = b.id_barang AND s2.id_toko = 2
+    LEFT JOIN stock s3 ON s3.id_barang = b.id_barang AND s3.id_toko = 3
+    WHERE DATE(r.tanggal) = '$tanggal'
+";
+
 
     $result = mysqli_query($conn, $query);
     $rows = mysqli_fetch_all($result, MYSQLI_ASSOC);
-    $stok_toko = [];
-    foreach ($rows as $row) {
-        $id_barang = $row['id_barang'];
-        if (!isset($stok_toko[$id_barang])) {
-            $stok_toko[$id_barang] = [];
-        }
-        $stok_toko[$id_barang][$row['toko_riwayat']] = ($stok_toko[$id_barang][$row['toko_riwayat']] ?? 0) + ($row['jenis'] === 'masuk' ? $row['jumlah'] : -$row['jumlah']);
-    }
 }
 ?>
 <!-- Begin Page Content -->
@@ -83,7 +81,7 @@ if (isset($_GET['tanggal'])) {
                 <th>Stock Toko 3</th>
                 <th>Stock Total</th>
                 <th>Minimal Stock</th>
-                <th>Perubahan</th>
+                <th>Penambahan Stock</th>
             </tr>
         </thead>
         <tbody>
@@ -95,7 +93,7 @@ if (isset($_GET['tanggal'])) {
             }
             foreach ($rows as $data):
                 $idb = $data['id_barang'];
-                $total_stock = array_sum($stok_toko[$idb]);
+                
             ?>
                 <tr>
                     <td><?= $no++ ?></td>
@@ -105,12 +103,13 @@ if (isset($_GET['tanggal'])) {
                     <td><?= number_format($data['harga_pokok']) ?></td>
                     <td><?= number_format($data['harga_jual']) ?></td>
                     <td><?= number_format($data['laba']) ?></td>
-                    <td><?= $stok_toko[$idb][1] ?? 0 ?></td>
-                    <td><?= $stok_toko[$idb][2] ?? 0 ?></td>
-                    <td><?= $stok_toko[$idb][3] ?? 0 ?></td>
-                    <td><?= $total_stock ?></td>
+                    <td><?= $data['stock_toko_1'] ?? 0 ?></td>
+                    <td><?= $data['stock_toko_2'] ?? 0 ?></td>
+                    <td><?= $data['stock_toko_3'] ?? 0 ?></td>
+                    <td><?= ($data['stock_toko_1'] ?? 0) + ($data['stock_toko_2'] ?? 0) + ($data['stock_toko_3'] ?? 0) ?></td>
                     <td><?= $data['minimal_stock'] ?></td>
-                    <td><?= $data['jenis'] == 'masuk' ? '+' : '-' ?><?= $data['jumlah'] ?></td>
+                    <td><?= $data['jenis'] == 'masuk' ? '+' . $data['jumlah'] : '0' ?></td>
+
                 </tr>
             <?php endforeach; ?>
         </tbody>
