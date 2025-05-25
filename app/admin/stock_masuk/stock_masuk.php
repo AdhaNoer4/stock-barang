@@ -1,5 +1,6 @@
 <?php
 require('proses_masuk.php');
+require_once('../../../config.php');
 $judul = "Tambah Pengguna";
 include('../layouts/header.php');
 
@@ -14,11 +15,26 @@ $result = mysqli_query($conn, "SELECT rs.*,s.id_barang, u.nama, b.nama_barang FR
     <h1 class="h3 mb-2 text-gray-800">Stock Masuk</h1>
     <div class="page-body">
         <div class="container-xl">
+            <?php
+            $queryToko = mysqli_query($conn, "SELECT id_toko, nama_toko FROM toko");
+            ?>
             <form method="POST" enctype="multipart/form-data">
                 <div class="row">
                     <div class="col-md-6">
                         <div class="card">
                             <div class="card-body">
+                                <div class="mb-3">
+                                    <label for="id_toko">Pilih Toko</label>
+                                    <select name="id_toko" class="form-control" required>
+                                        <option value="">-- Pilih Toko --</option>
+                                        <?php while ($toko = mysqli_fetch_assoc($queryToko)) : ?>
+                                            <option value="<?= $toko['id_toko']; ?>" <?= (isset($_POST['id_toko']) && $_POST['id_toko'] == $toko['id_toko']) ? 'selected' : '' ?>>
+                                                <?= htmlspecialchars($toko['nama_toko']); ?>
+                                            </option>
+                                        <?php endwhile; ?>
+                                    </select>
+                                </div>
+
                                 <div class="mb-3">
                                     <label for="id_barang">Nama Barang</label>
                                     <select name="id_barang" class="form-control">

@@ -11,7 +11,7 @@ require_once('../../../config.php');
 if (isset($_GET['id'])) {
     $idbarang = intval($_GET['id']);
 
-    $hapus = mysqli_query($conn, "DELETE FROM stock WHERE idbarang = $idbarang");
+    $hapus = mysqli_query($conn, "DELETE FROM barang WHERE id_barang = $idbarang");
 
     if ($hapus) {
         $_SESSION['berhasil'] = "Barang berhasil dihapus!";
