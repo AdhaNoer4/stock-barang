@@ -75,9 +75,9 @@ $rows = mysqli_fetch_all($result, MYSQLI_ASSOC);
                 <td><?= date('d-m-Y', strtotime($data['tanggal'])) ?></td>
                 <td><?= $data['kode_barang'] ?></td>
                 <td><?= $data['nama_barang'] ?></td>
-                <td><?= number_format($data['harga_pokok']) ?></td>
-                <td><?= number_format($data['harga_jual']) ?></td>
-                <td><?= number_format($data['laba']) ?></td>
+                <td><?= $data['harga_pokok'] ?></td>
+                <td><?= $data['harga_jual'] ?></td>
+                <td><?= $data['laba'] ?></td>
                 <td><?= $data['stock'] ?? 0 ?></td>
                 <td><?= $data['minimal_stock'] ?></td>
                 <td><?= $data['jenis'] == 'masuk' ? '+' . $data['jumlah'] : '0' ?></td>
