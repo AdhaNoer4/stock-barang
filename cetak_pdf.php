@@ -45,13 +45,13 @@ while ($row = mysqli_fetch_assoc($result)) {
             'stock_toko_1' => 0,
             'stock_toko_2' => 0,
             'stock_toko_3' => 0,
-            'perubahan_stock' => 0, // bisa diisi dari riwayat_stok
-            'tanggal' => '', // bisa diisi dari riwayat_stok
+            'perubahan_stock' => 0,
+            'tanggal' => $tanggal_input,
         ];
     }
 
-    if ($id_toko == 1 || $id_toko == 2 || $id_toko == 3) {
-        $data[$id_barang][$stokField] = $row['stock_toko'];
+    if (in_array($id_toko, [1, 2, 3])) {
+        $data[$id_barang][$stokField] += $row['stock_toko'];
     }
 
 
