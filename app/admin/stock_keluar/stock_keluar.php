@@ -6,8 +6,7 @@ $judul = "Stock Keluar";
 include('../layouts/header.php');
 
 
-$id_toko_filter = isset($_POST['id_toko']) ? intval($_POST['id_toko']) : 0;
-$barang = mysqli_query($conn, "SELECT nama_barang, id_barang FROM barang WHERE id_toko = $id_toko_filter ORDER BY nama_barang ASC");
+$barang = mysqli_query($conn, "SELECT nama_barang, id_barang FROM barang WHERE id_toko = '$_SESSION[id_toko]' ORDER BY nama_barang ASC");
 $result = mysqli_query($conn, "SELECT rs.*,s.id_barang, u.nama, b.nama_barang FROM riwayat_stok rs JOIN stock s ON rs.id_barang = s.id_barang JOIN user u ON rs.id_user = u.id_user JOIN barang b ON rs.id_barang = b.id_barang WHERE jenis = 'keluar' AND tanggal = CURDATE() ORDER BY rs.tanggal DESC");
 ?>
 <!-- Begin Page Content -->
@@ -23,9 +22,9 @@ $result = mysqli_query($conn, "SELECT rs.*,s.id_barang, u.nama, b.nama_barang FR
                         <div class="card">
                             <div class="card-body">
 
-                                <div class="mb-3">
+                                 <div class="mb-3">
                                     <label for="id_toko">Pilih Toko</label>
-                                    <select name="id_toko" class="form-control" onchange="this.form.submit()">
+                                    <select name="id_toko" class="form-control" required>
                                         <option value="">-- Pilih Toko --</option>
                                         <?php while ($toko = mysqli_fetch_assoc($queryToko)) : ?>
                                             <option value="<?= $toko['id_toko']; ?>" <?= (isset($_POST['id_toko']) && $_POST['id_toko'] == $toko['id_toko']) ? 'selected' : '' ?>>

@@ -61,7 +61,7 @@ if (isset($_GET['tanggal'])) {
         <button type="submit" class="btn btn-danger mt-3">Download PDF</button>
     </form>
 
-    <form class="mb-5" method="POST" action="export_excel.php" target="_blank">
+    <form class="mb-5" method="POST" action="cetak_excel.php" target="_blank">
         <input type="hidden" name="tanggal" value="<?= $tanggal ?>">
         <button type="submit" class="btn btn-success mt-3">Download Excel</button>
     </form>
