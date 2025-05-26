@@ -1,0 +1,24 @@
+# Composer dependencies
+/vendor/
+
+# Cache dan log
+*.log
+*.cache
+
+# File bawaan sistem
+.DS_Store
+Thumbs.db
+
+# Editor/IDE
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Sistem upload
+uploads/
+storage/
+
+# File konfigurasi sensitif
+.env
+config.php
