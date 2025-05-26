@@ -13,18 +13,18 @@ $mpdf->SetTitle('Laporan Stok Barang - ' . $tanggal_input);
 
 // Ambil data stok berdasarkan tanggal
 $sql = "SELECT 
-            b.id_barang,
-            b.kode_barang,
-            b.nama_barang,
-            b.harga_pokok,
-            b.harga_jual,
-            (b.harga_jual - b.harga_pokok) AS laba,
-            b.minimal_stock,
-            s.id_toko,
-            s.stock AS stock_toko
-        FROM barang b
-        JOIN stock s ON b.id_barang = s.id_barang
-        ORDER BY b.id_barang, s.id_toko";
+    b.id_barang,
+    b.kode_barang,
+    b.nama_barang,
+    b.harga_pokok,
+    b.harga_jual,
+    (b.harga_jual - b.harga_pokok) AS laba,
+    b.minimal_stock,
+    s.id_toko,
+    s.stock AS stock_toko
+FROM barang b
+LEFT JOIN stock s ON b.id_barang = s.id_barang
+ORDER BY b.id_barang, s.id_toko";
 
 $result = mysqli_query($conn, $sql);
 
@@ -45,6 +45,8 @@ while ($row = mysqli_fetch_assoc($result)) {
             'stock_toko_1' => 0,
             'stock_toko_2' => 0,
             'stock_toko_3' => 0,
+            'perubahan_stock' => 0,
+            'tanggal' => $tanggal_input,
             'perubahan_stock' => 0,
             'tanggal' => $tanggal_input,
         ];
