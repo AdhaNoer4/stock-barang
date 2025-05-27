@@ -1,9 +1,12 @@
-<?php 
+<?php
 require('proses_keluar.php');
 require_once('../../../config.php');
-$queryToko = mysqli_query($conn, "SELECT id_toko, nama_toko FROM toko");
-$judul = "Stock Keluar";
+$judul = "Stock keluar";
 include('../layouts/header.php');
+
+
+// Ambil daftar toko
+$queryToko = mysqli_query($conn, "SELECT id_toko, nama_toko FROM toko");
 
 // Simpan toko terpilih ke session
 if (isset($_POST['pilih_toko'])) {
@@ -16,9 +19,11 @@ if (isset($_POST['pilih_toko'])) {
 $id_toko_terpilih = $_SESSION['id_toko'] ?? '';
 
 // Ambil data barang berdasarkan toko
-$barang = mysqli_query($conn, "SELECT nama_barang, id_barang FROM barang WHERE id_toko = '$id_toko_terpilih' ORDER BY nama_barang ASC");
 
-// Ambil riwayat hari ini
+$barang = mysqli_query($conn, "SELECT b.nama_barang, s.id_barang FROM stock s JOIN barang b ON s.id_barang = b.id_barang WHERE id_toko = '$id_toko_terpilih' ORDER BY b.nama_barang ASC");
+
+// Ambil riwayat keluar hari ini
+
 $result = mysqli_query($conn, "SELECT rs.*,s.id_barang, u.nama, b.nama_barang 
 FROM riwayat_stok rs 
 JOIN stock s ON rs.id_barang = s.id_barang 
@@ -31,7 +36,6 @@ ORDER BY rs.tanggal DESC");
 <!-- Begin Page Content -->
 <div class="container-fluid">
 
-    <!-- Page Heading -->
     <h1 class="h3 mb-2 text-gray-800"><?= $judul; ?></h1>
     <div class="page-body">
         <div class="container-xl">
@@ -51,61 +55,62 @@ ORDER BY rs.tanggal DESC");
                 </div>
             </form>
 
-            <!-- Form Stock Keluar -->
+
+            <!-- Form Stock keluar -->
             <?php if ($id_toko_terpilih): ?>
-            <form method="POST" enctype="multipart/form-data">
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="card">
-                            <div class="card-body">
+                <form method="POST" enctype="multipart/form-data">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-body">
+                                    <input type="hidden" name="id_toko" value="<?= $id_toko_terpilih ?>">
 
-                                <!-- Hidden id_toko -->
-                                <input type="hidden" name="id_toko" value="<?= $id_toko_terpilih ?>">
+                                    <div class="mb-3">
+                                        <label for="id_barang">Nama Barang</label>
+                                        <select name="id_barang" class="form-control" required>
+                                            <option value="">--Pilih Barang--</option>
+                                            <?php while ($row = mysqli_fetch_assoc($barang)): ?>
+                                                <option value="<?= $row['id_barang'] ?>"><?= $row['nama_barang'] ?></option>
+                                            <?php endwhile; ?>
+                                        </select>
+                                    </div>
 
-                                <div class="mb-3">
-                                    <label for="id_barang">Nama Barang</label>
-                                    <select name="id_barang" class="form-control" required>
-                                        <option value="">--Pilih Barang--</option>
-                                        <?php while ($row = mysqli_fetch_assoc($barang)): ?>
-                                            <option value="<?= $row['id_barang'] ?>"><?= $row['nama_barang'] ?></option>
-                                        <?php endwhile; ?>
-                                    </select>
-                                </div>
+                                    <div class="mb-3">
+                                        <label for="jumlah">Jumlah keluar</label>
+                                        <input type="number" name="jumlah" class="form-control" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="penerima">penerima</label>
+                                        <input type="text" name="penerima" class="form-control">
+                                    </div>
 
-                                <div class="mb-3">
-                                    <label for="jumlah">Jumlah Keluar</label>
-                                    <input type="number" name="jumlah" class="form-control" required>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="penerima">Penerima</label>
-                                    <input type="text" name="penerima" class="form-control" required>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="tanggal">Tanggal</label>
-                                    <input type="date" name="tanggal" class="form-control" required>
-                                </div>
+                                    <div class="mb-3">
+                                        <label for="tanggal">Tanggal</label>
+                                        <input type="date" name="tanggal" class="form-control" required>
+                                    </div>
 
-                                <div class="mb-3 text-end">
-                                    <button type="submit" class="btn btn-primary" name="submit">Keluarkan</button>
+                                    <div class="mb-3 text-end">
+                                        <button type="submit" class="btn btn-primary" name="submit">keluarkan</button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </form>
-            <?php endif; ?>
 
+                </form>
+            <?php endif; ?>
         </div>
     </div>
 
-    <!--Table Riwayat Keluar -->
+    <!-- Riwayat Hari Ini -->
+
     <div class="card shadow mb-4 mt-4">
         <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Riwayat Keluar Hari ini</h6>
+            <h6 class="m-0 font-weight-bold text-primary">Riwayat keluar Hari ini</h6>
         </div>
         <div class="card-body">
             <div class="table-responsive">
-                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                <table class="table table-bordered" width="100%" cellspacing="0">
                     <thead>
                         <tr>
                             <th>No.</th>
@@ -122,7 +127,8 @@ ORDER BY rs.tanggal DESC");
                                 <td colspan="6">Data kosong, silakan tambah data baru.</td>
                             </tr>
                         <?php } else { ?>
-                            <?php $no = 1; while ($riwayat = mysqli_fetch_array($result)) : ?>
+                            <?php $no = 1;
+                            while ($riwayat = mysqli_fetch_array($result)) : ?>
                                 <tr class="text-center">
                                     <td><?= $no++ ?></td>
                                     <td><?= $riwayat['tanggal']; ?></td>
@@ -139,6 +145,5 @@ ORDER BY rs.tanggal DESC");
         </div>
     </div>
 </div>
-<!-- /.container-fluid -->
 
 <?php include('../layouts/footer.php') ?>

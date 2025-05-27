@@ -18,7 +18,9 @@ if (isset($_POST['pilih_toko'])) {
 $id_toko_terpilih = $_SESSION['id_toko'] ?? '';
 
 // Ambil data barang berdasarkan toko
-$barang = mysqli_query($conn, "SELECT nama_barang, id_barang FROM barang WHERE id_toko = '$id_toko_terpilih' ORDER BY nama_barang ASC");
+
+$barang = mysqli_query($conn, "SELECT b.nama_barang, s.id_barang FROM stock s JOIN barang b ON s.id_barang = b.id_barang WHERE id_toko = '$id_toko_terpilih' ORDER BY b.nama_barang ASC");
+
 
 // Ambil riwayat masuk hari ini
 $result = mysqli_query($conn, "SELECT rs.*,s.id_barang, u.nama, b.nama_barang 
@@ -52,50 +54,53 @@ ORDER BY rs.tanggal DESC");
                 </div>
             </form>
 
+
             <!-- Form Stock Masuk -->
             <?php if ($id_toko_terpilih): ?>
-            <form method="POST" enctype="multipart/form-data">
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="card">
-                            <div class="card-body">
-                                <input type="hidden" name="id_toko" value="<?= $id_toko_terpilih ?>">
+                <form method="POST" enctype="multipart/form-data">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-body">
+                                    <input type="hidden" name="id_toko" value="<?= $id_toko_terpilih ?>">
 
-                                <div class="mb-3">
-                                    <label for="id_barang">Nama Barang</label>
-                                    <select name="id_barang" class="form-control" required>
-                                        <option value="">--Pilih Barang--</option>
-                                        <?php while ($row = mysqli_fetch_assoc($barang)): ?>
-                                            <option value="<?= $row['id_barang'] ?>"><?= $row['nama_barang'] ?></option>
-                                        <?php endwhile; ?>
-                                    </select>
-                                </div>
+                                    <div class="mb-3">
+                                        <label for="id_barang">Nama Barang</label>
+                                        <select name="id_barang" class="form-control" required>
+                                            <option value="">--Pilih Barang--</option>
+                                            <?php while ($row = mysqli_fetch_assoc($barang)): ?>
+                                                <option value="<?= $row['id_barang'] ?>"><?= $row['nama_barang'] ?></option>
+                                            <?php endwhile; ?>
+                                        </select>
+                                    </div>
 
-                                <div class="mb-3">
-                                    <label for="jumlah">Jumlah Masuk</label>
-                                    <input type="number" name="jumlah" class="form-control" required>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="keterangan">Keterangan</label>
-                                    <input type="text" name="keterangan" class="form-control">
-                                </div>
-                                <div class="mb-3">
-                                    <label for="penerima">Pengirim</label>
-                                    <input type="text" name="penerima" class="form-control" required>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="tanggal">Tanggal</label>
-                                    <input type="date" name="tanggal" class="form-control" required>
-                                </div>
+                                    <div class="mb-3">
+                                        <label for="jumlah">Jumlah Masuk</label>
+                                        <input type="number" name="jumlah" class="form-control" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="keterangan">Keterangan</label>
+                                        <input type="text" name="keterangan" class="form-control">
+                                    </div>
 
-                                <div class="mb-3 text-end">
-                                    <button type="submit" class="btn btn-primary" name="submit">Masukkan</button>
+                                    <div class="mb-3">
+                                        <label for="tanggal">Tanggal</label>
+                                        <input type="date" name="tanggal" class="form-control" required>
+                                    </div>
+
+                                    <div class="mb-3 text-end">
+                                        <button type="submit" class="btn btn-primary" name="submit">Masukkan</button>
+                                    </div>
+
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </form>
+
+              
+
+                </form>
+
             <?php endif; ?>
         </div>
     </div>

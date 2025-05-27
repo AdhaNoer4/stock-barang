@@ -10,7 +10,9 @@ require_once('../../../config.php');
 
 if (isset($_POST['submit'])) {
     $id_barang = htmlspecialchars($_POST['id_barang']);
-        $jumlah = htmlspecialchars($_POST['jumlah']);
+
+    $jumlah = htmlspecialchars($_POST['jumlah']);
+
     $keterangan = htmlspecialchars($_POST['keterangan'] ?? '');
     $tanggal = htmlspecialchars($_POST['tanggal']);
     $id_toko = isset($_POST['id_toko']) ? intval($_POST['id_toko']) : null;

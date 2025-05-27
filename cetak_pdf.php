@@ -1,75 +1,59 @@
 <?php
 require_once __DIR__ . '/vendor/autoload.php';
-require_once 'config.php'; // Koneksi ke database
+require_once 'config.php';
 
 use Mpdf\Mpdf;
 
-// Ambil input tanggal
-$tanggal_input = isset($_POST['tanggal']) ? $_POST['tanggal'] : date('Y-m-d');
-
-// Inisialisasi Mpdf
+$tanggal_input = $_POST['tanggal'] ?? date('Y-m-d');
 $mpdf = new Mpdf(['mode' => 'utf-8', 'format' => 'A4']);
 $mpdf->SetTitle('Laporan Stok Barang - ' . $tanggal_input);
 
-// Ambil data stok berdasarkan tanggal
-$sql = "SELECT 
-    b.id_barang,
-    b.kode_barang,
-    b.nama_barang,
-    b.harga_pokok,
-    b.harga_jual,
-    (b.harga_jual - b.harga_pokok) AS laba,
-    b.minimal_stock,
-    s.id_toko,
-    s.stock AS stock_toko
-FROM barang b
-LEFT JOIN stock s ON b.id_barang = s.id_barang
-ORDER BY b.id_barang, s.id_toko";
+// Ambil semua data barang
+$sql_barang = "SELECT * FROM barang ORDER BY id_barang";
+$result_barang = mysqli_query($conn, $sql_barang);
 
-$result = mysqli_query($conn, $sql);
-
+// Siapkan array data
 $data = [];
-while ($row = mysqli_fetch_assoc($result)) {
+while ($row = mysqli_fetch_assoc($result_barang)) {
+    $id_barang = $row['id_barang'];
+    $data[$id_barang] = [
+        'kode_barang' => $row['kode_barang'],
+        'nama_barang' => $row['nama_barang'],
+        'harga_pokok' => $row['harga_pokok'],
+        'harga_jual' => $row['harga_jual'],
+        'laba' => $row['harga_jual'] - $row['harga_pokok'],
+        'minimal_stock' => $row['minimal_stock'],
+        'stock_toko_1' => 0,
+        'stock_toko_2' => 0,
+        'stock_toko_3' => 0,
+        'perubahan_stock' => 0,
+        'tanggal' => $tanggal_input,
+    ];
+}
+
+// Ambil data stok semua toko
+$sql_stok = "SELECT id_barang, id_toko, stock FROM stock";
+$result_stok = mysqli_query($conn, $sql_stok);
+while ($row = mysqli_fetch_assoc($result_stok)) {
     $id_barang = $row['id_barang'];
     $id_toko = $row['id_toko'];
-    $stokField = "stock_toko_" . $id_toko;
+    $stok = $row['stock'];
 
-    if (!isset($data[$id_barang])) {
-        $data[$id_barang] = [
-            'kode_barang' => $row['kode_barang'],
-            'nama_barang' => $row['nama_barang'],
-            'harga_pokok' => $row['harga_pokok'],
-            'harga_jual' => $row['harga_jual'],
-            'laba' => $row['laba'],
-            'minimal_stock' => $row['minimal_stock'],
-            'stock_toko_1' => 0,
-            'stock_toko_2' => 0,
-            'stock_toko_3' => 0,
-            'perubahan_stock' => 0,
-            'tanggal' => $tanggal_input,
-            'perubahan_stock' => 0,
-            'tanggal' => $tanggal_input,
-        ];
+
+    if (isset($data[$id_barang])) {
+        $data[$id_barang]["stock_toko_$id_toko"] = $stok;
     }
-
-    if (in_array($id_toko, [1, 2, 3])) {
-        $data[$id_barang][$stokField] += $row['stock_toko'];
-    }
-
-
-    $data[$id_barang]['tanggal'] = $tanggal_input;
 }
-// Ambil perubahan stock dari riwayat_stok untuk jenis 'masuk' pada tanggal yang dipilih
+
+// Ambil perubahan stock dari riwayat_stok pada tanggal tertentu
 $sql_riwayat = "SELECT id_barang, SUM(jumlah) AS penambahan
                 FROM riwayat_stok
                 WHERE jenis = 'masuk' AND tanggal = ?
                 GROUP BY id_barang";
-
 $stmt = $conn->prepare($sql_riwayat);
 $stmt->bind_param("s", $tanggal_input);
 $stmt->execute();
 $result_riwayat = $stmt->get_result();
-
 while ($row = $result_riwayat->fetch_assoc()) {
     $id_barang = $row['id_barang'];
     if (isset($data[$id_barang])) {
@@ -77,9 +61,7 @@ while ($row = $result_riwayat->fetch_assoc()) {
     }
 }
 
-
-
-// Buat tampilan HTML
+// Bangun HTML
 $html = '
 <style>
     body { font-family: sans-serif; }
@@ -131,6 +113,6 @@ foreach ($data as $item) {
 
 $html .= '</tbody></table>';
 
-// Output PDF
+// Output ke PDF
 $mpdf->WriteHTML($html);
 $mpdf->Output('laporan_stok_' . $tanggal_input . '.pdf', 'I');

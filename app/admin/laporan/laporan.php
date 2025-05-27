@@ -11,6 +11,7 @@ include('../layouts/header.php');
 
 if (isset($_GET['tanggal'])) {
     $tanggal = $_GET['tanggal'];
+    $jenis = isset($_GET['jenis']) ? $_GET['jenis'] : '';
 
     $query = "
     SELECT 
@@ -24,23 +25,26 @@ if (isset($_GET['tanggal'])) {
         b.id_barang,
         r.jumlah,
         r.jenis,
-        
         s1.stock AS stock_toko_1,
         s2.stock AS stock_toko_2,
         s3.stock AS stock_toko_3
-
     FROM riwayat_stok r
     JOIN barang b ON r.id_barang = b.id_barang
     LEFT JOIN stock s1 ON s1.id_barang = b.id_barang AND s1.id_toko = 1
     LEFT JOIN stock s2 ON s2.id_barang = b.id_barang AND s2.id_toko = 2
     LEFT JOIN stock s3 ON s3.id_barang = b.id_barang AND s3.id_toko = 3
     WHERE DATE(r.tanggal) = '$tanggal'
-";
+    ";
 
+    // Filter jenis jika dipilih
+    if ($jenis !== '') {
+        $query .= " AND r.jenis = '$jenis'";
+    }
 
     $result = mysqli_query($conn, $query);
     $rows = mysqli_fetch_all($result, MYSQLI_ASSOC);
 }
+
 ?>
 <!-- Begin Page Content -->
 <div class="container mt-4">
@@ -50,6 +54,14 @@ if (isset($_GET['tanggal'])) {
             <div class="col-auto">
                 <label for="tanggal" class="form-label">Pilih Tanggal</label>
                 <input type="date" class="form-control" id="tanggal" name="tanggal" value="<?= isset($_GET['tanggal']) ? $_GET['tanggal'] : '' ?>" required>
+            </div>
+            <div class="col-auto">
+                <label for="jenis" class="form-label">Jenis</label>
+                <select name="jenis" id="jenis" class="form-select">
+                    <option value="">Semua</option>
+                    <option value="masuk" <?= isset($_GET['jenis']) && $_GET['jenis'] === 'masuk' ? 'selected' : '' ?>>Masuk</option>
+                    <option value="keluar" <?= isset($_GET['jenis']) && $_GET['jenis'] === 'keluar' ? 'selected' : '' ?>>Keluar</option>
+                </select>
             </div>
             <div class="col-auto">
                 <button type="submit" class="btn btn-primary">Tampilkan Laporan</button>
@@ -93,7 +105,7 @@ if (isset($_GET['tanggal'])) {
             }
             foreach ($rows as $data):
                 $idb = $data['id_barang'];
-                
+
             ?>
                 <tr>
                     <td><?= $no++ ?></td>
@@ -108,7 +120,8 @@ if (isset($_GET['tanggal'])) {
                     <td><?= $data['stock_toko_3'] ?? 0 ?></td>
                     <td><?= ($data['stock_toko_1'] ?? 0) + ($data['stock_toko_2'] ?? 0) + ($data['stock_toko_3'] ?? 0) ?></td>
                     <td><?= $data['minimal_stock'] ?></td>
-                    <td><?= $data['jenis'] == 'masuk' ? '+' . $data['jumlah'] : '0' ?></td>
+                    <td><?= $data['jenis'] == 'masuk' ? '+' . $data['jumlah'] : '-' . $data['jumlah'] ?></td>
+
 
                 </tr>
             <?php endforeach; ?>
