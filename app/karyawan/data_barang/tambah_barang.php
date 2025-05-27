@@ -56,9 +56,9 @@ if (isset($_POST['submit'])) {
 
                 // Insert ke tabel barang
                 $stmtBarang = mysqli_prepare($conn, "INSERT INTO barang 
-                (kode_barang, nama_barang, harga_pokok, harga_jual, laba, minimal_stock, id_toko, id_stock)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-                mysqli_stmt_bind_param($stmtBarang, "ssiiiiii", $kodebarang, $namabarang, $hargapokok, $hargajual, $laba, $minimalstock, $id_toko, $id_stock);
+                (kode_barang, nama_barang, harga_pokok, harga_jual, laba, minimal_stock)
+                VALUES (?, ?, ?, ?, ?, ?)");
+                mysqli_stmt_bind_param($stmtBarang, "ssiiii", $kodebarang, $namabarang, $hargapokok, $hargajual, $laba, $minimalstock);
                 mysqli_stmt_execute($stmtBarang);
                 $id_barang_baru = mysqli_insert_id($conn);
 

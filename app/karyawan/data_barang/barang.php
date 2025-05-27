@@ -11,8 +11,8 @@ require_once('../../../config.php');
 
 $id_toko = $_SESSION['id_toko'];
 
-$result = mysqli_query($conn, "SELECT barang.id_barang, barang.kode_barang, barang.nama_barang, barang.harga_pokok, barang.harga_jual, barang.minimal_stock, barang.id_toko, stock.stock  FROM barang LEFT JOIN 
-    stock ON barang.id_barang = stock.id_barang WHERE barang.id_toko = '$id_toko' ");
+$result = mysqli_query($conn, "SELECT barang.id_barang, barang.kode_barang, barang.nama_barang, barang.harga_pokok, barang.harga_jual, barang.minimal_stock, stock.id_toko, stock.stock  FROM barang LEFT JOIN 
+    stock ON barang.id_barang = stock.id_barang WHERE stock.id_toko = '$id_toko' ");
 
 ?>
 
