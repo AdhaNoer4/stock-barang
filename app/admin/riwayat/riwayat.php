@@ -10,7 +10,24 @@ $judul = "Riwayat";
 include('../layouts/header.php');
 require_once('../../../config.php');
 
-$result = mysqli_query($conn, "SELECT rs.*,s.id_barang, u.nama, b.nama_barang FROM riwayat_stok rs JOIN stock s ON rs.id_barang = s.id_barang JOIN user u ON rs.id_user = u.id_user JOIN barang b ON rs.id_barang = b.id_barang WHERE tanggal = CURDATE() ORDER BY rs.tanggal DESC");
+$id_toko = $_SESSION['id_toko'] ?? null;
+
+$query = "
+  SELECT rs.*, u.nama, b.nama_barang 
+  FROM riwayat_stok rs 
+  JOIN user u ON rs.id_user = u.id_user 
+  JOIN barang b ON rs.id_barang = b.id_barang 
+  WHERE rs.tanggal = CURDATE()
+";
+
+if ($id_toko) {
+  $query .= " AND rs.id_toko = '$id_toko'";
+}
+
+$query .= " ORDER BY rs.tanggal DESC";
+
+$result = mysqli_query($conn, $query);
+
 
 ?>
 

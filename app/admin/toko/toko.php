@@ -55,7 +55,8 @@ $result = mysqli_query($conn, "SELECT * FROM toko;");
                                     <td>+62<?= $toko['telepon'] ?></td>
                                     <td>
                                         <a href="edit.php?id=<?= $toko['id_toko'] ?>" class="btn btn-success"><i class="far fa-edit"></i></a>
-                                        <a href="hapus.php?id=<?= $toko['id_toko'] ?>" class="btn btn-danger tombol-hapus"><i class="far fa-trash-alt"></i></a>
+                                        <a href="hapus.php?id=<?= $toko['id_toko'] ?>" class="btn btn-danger tombol-hapus" onclick="return confirm('Yakin ingin menghapus toko ini?')">  
+                                            <i class="far fa-trash-alt"></i></a>
                                     </td>
                                 </tr>
                             <?php endwhile; ?>

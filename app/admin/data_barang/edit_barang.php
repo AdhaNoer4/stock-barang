@@ -32,9 +32,8 @@ if (isset($_POST['submit'])) {
     $minimalstock = intval($_POST['minimal_stock']);
 
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        if (empty($namabarang)) {
-            $pesan_kesalahan[] = "Nama barang wajib diisi!";
-        }
+
+        
         if (empty($namabarang)) {
             $pesan_kesalahan[] = "Nama barang wajib diisi!";
         }

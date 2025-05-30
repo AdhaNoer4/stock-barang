@@ -1,43 +1,54 @@
 <?php
-require('proses_masuk.php');
+session_start();
 require_once('../../../config.php');
-$judul = "Stock Masuk";
-include('../layouts/header.php');
-
-// Ambil daftar toko
-$queryToko = mysqli_query($conn, "SELECT id_toko, nama_toko FROM toko");
-
 // Simpan toko terpilih ke session
 if (isset($_POST['pilih_toko'])) {
     $_SESSION['id_toko'] = $_POST['id_toko'];
     header("Location: " . $_SERVER['PHP_SELF']);
     exit;
 }
+$judul = "Stock Masuk";
+include('../layouts/header.php');
 
-// Ambil toko dari session jika sudah dipilih
+// Ambil daftar toko
+$queryToko = mysqli_query($conn, "SELECT id_toko, nama_toko FROM toko");
+
+
+// Ambil toko dari session
 $id_toko_terpilih = $_SESSION['id_toko'] ?? '';
 
-// Ambil data barang berdasarkan toko
+// Ambil data barang untuk toko terpilih
+$barang = [];
+if (!empty($id_toko_terpilih)) {
+    $barang = mysqli_query($conn, "SELECT b.nama_barang, s.id_barang 
+        FROM stock s 
+        JOIN barang b ON s.id_barang = b.id_barang 
+        WHERE s.id_toko = '$id_toko_terpilih' 
+        ORDER BY b.nama_barang ASC");
+}
 
-$barang = mysqli_query($conn, "SELECT b.nama_barang, s.id_barang FROM stock s JOIN barang b ON s.id_barang = b.id_barang WHERE id_toko = '$id_toko_terpilih' ORDER BY b.nama_barang ASC");
-
-
-// Ambil riwayat masuk hari ini
-$result = mysqli_query($conn, "SELECT rs.*,s.id_barang, u.nama, b.nama_barang 
-FROM riwayat_stok rs 
-JOIN stock s ON rs.id_barang = s.id_barang 
-JOIN user u ON rs.id_user = u.id_user 
-JOIN barang b ON rs.id_barang = b.id_barang 
-WHERE jenis = 'masuk' AND tanggal = CURDATE() 
-ORDER BY rs.tanggal DESC");
+// Ambil riwayat stok masuk hari ini untuk toko terpilih
+$result = [];
+if (!empty($id_toko_terpilih)) {
+    $result = mysqli_query($conn, "
+        SELECT rs.*, u.nama, b.nama_barang 
+        FROM riwayat_stok rs
+        JOIN barang b ON rs.id_barang = b.id_barang
+        JOIN user u ON rs.id_user = u.id_user
+        WHERE rs.jenis = 'masuk' 
+          AND rs.tanggal = CURDATE()
+          AND rs.id_toko = '$id_toko_terpilih'
+        ORDER BY rs.tanggal DESC
+    ");
+}
 ?>
 
 <!-- Begin Page Content -->
 <div class="container-fluid">
-
     <h1 class="h3 mb-2 text-gray-800"><?= $judul; ?></h1>
     <div class="page-body">
         <div class="container-xl">
+
             <!-- Form Pilih Toko -->
             <form method="POST">
                 <div class="mb-3">
@@ -54,10 +65,9 @@ ORDER BY rs.tanggal DESC");
                 </div>
             </form>
 
-
             <!-- Form Stock Masuk -->
-            <?php if ($id_toko_terpilih): ?>
-                <form method="POST" enctype="multipart/form-data">
+            <?php if (!empty($id_toko_terpilih)): ?>
+                <form method="POST" action="proses_masuk.php">
                     <div class="row">
                         <div class="col-md-6">
                             <div class="card">
@@ -82,7 +92,6 @@ ORDER BY rs.tanggal DESC");
                                         <label for="keterangan">Keterangan</label>
                                         <input type="text" name="keterangan" class="form-control">
                                     </div>
-
                                     <div class="mb-3">
                                         <label for="tanggal">Tanggal</label>
                                         <input type="date" name="tanggal" class="form-control" required>
@@ -91,16 +100,11 @@ ORDER BY rs.tanggal DESC");
                                     <div class="mb-3 text-end">
                                         <button type="submit" class="btn btn-primary" name="submit">Masukkan</button>
                                     </div>
-
                                 </div>
                             </div>
                         </div>
                     </div>
-
-              
-
                 </form>
-
             <?php endif; ?>
         </div>
     </div>
@@ -124,12 +128,12 @@ ORDER BY rs.tanggal DESC");
                         </tr>
                     </thead>
                     <tbody>
-                        <?php if (mysqli_num_rows($result) === 0) { ?>
+                        <?php if (empty($result) || mysqli_num_rows($result) === 0) : ?>
                             <tr>
-                                <td colspan="6">Data kosong, silakan tambah data baru.</td>
+                                <td colspan="6" class="text-center">Data kosong, silakan tambah data baru.</td>
                             </tr>
-                        <?php } else { ?>
-                            <?php $no = 1; while ($riwayat = mysqli_fetch_array($result)) : ?>
+                        <?php else: ?>
+                            <?php $no = 1; while ($riwayat = mysqli_fetch_assoc($result)) : ?>
                                 <tr class="text-center">
                                     <td><?= $no++ ?></td>
                                     <td><?= $riwayat['tanggal']; ?></td>
@@ -139,7 +143,7 @@ ORDER BY rs.tanggal DESC");
                                     <td><?= $riwayat['jenis'] ?></td>
                                 </tr>
                             <?php endwhile; ?>
-                        <?php } ?>
+                        <?php endif; ?>
                     </tbody>
                 </table>
             </div>
@@ -147,4 +151,4 @@ ORDER BY rs.tanggal DESC");
     </div>
 </div>
 
-<?php include('../layouts/footer.php') ?>
+<?php include('../layouts/footer.php'); ?>

@@ -3,19 +3,23 @@ session_start();
 ob_start();
 if (!isset($_SESSION["login"])) {
     header("Location: ../../auth/login.php?pesan=belum_login");
+    exit;
 } else if ($_SESSION["role"] !== "admin") {
     header("Location: ../../auth/login.php?pesan=tolak_akses");
+    exit;
 }
 require_once('../../../config.php');
 include('../layouts/header.php');
 
-if (isset($_GET['tanggal'])) {
-    $tanggal = $_GET['tanggal'];
-    $jenis = isset($_GET['jenis']) ? $_GET['jenis'] : '';
+// Ambil daftar toko
+$toko_query = mysqli_query($conn, "SELECT id_toko, nama_toko FROM toko ORDER BY id_toko");
+$toko_list = mysqli_fetch_all($toko_query, MYSQLI_ASSOC);
 
-    $query = "
+$tanggal = isset($_GET['tanggal']) ? $_GET['tanggal'] : date('Y-m-d');
+
+// Mulai susun query
+$query = "
     SELECT 
-        r.tanggal, 
         b.kode_barang, 
         b.nama_barang, 
         b.harga_pokok, 
@@ -23,112 +27,119 @@ if (isset($_GET['tanggal'])) {
         b.laba, 
         b.minimal_stock,
         b.id_barang,
-        r.jumlah,
-        r.jenis,
-        s1.stock AS stock_toko_1,
-        s2.stock AS stock_toko_2,
-        s3.stock AS stock_toko_3
-    FROM riwayat_stok r
-    JOIN barang b ON r.id_barang = b.id_barang
-    LEFT JOIN stock s1 ON s1.id_barang = b.id_barang AND s1.id_toko = 1
-    LEFT JOIN stock s2 ON s2.id_barang = b.id_barang AND s2.id_toko = 2
-    LEFT JOIN stock s3 ON s3.id_barang = b.id_barang AND s3.id_toko = 3
-    WHERE DATE(r.tanggal) = '$tanggal'
-    ";
+";
 
-    // Filter jenis jika dipilih
-    if ($jenis !== '') {
-        $query .= " AND r.jenis = '$jenis'";
-    }
-
-    $result = mysqli_query($conn, $query);
-    $rows = mysqli_fetch_all($result, MYSQLI_ASSOC);
+// Tambahkan kolom stok per toko dari subquery
+foreach ($toko_list as $toko) {
+    $id_toko = $toko['id_toko'];
+    $query .= "IFNULL(ss.stok_toko_$id_toko, 0) AS stok_toko_$id_toko, ";
 }
 
+$query .= "
+    IFNULL(ss.total_stock, 0) AS total_stock,
+    IFNULL(rs.penambahan_stok, 0) AS penambahan_stok
+FROM barang b
+LEFT JOIN (
+    SELECT 
+        id_barang,
+";
+
+// Subquery stok per toko
+foreach ($toko_list as $toko) {
+    $id_toko = $toko['id_toko'];
+    $query .= "SUM(CASE WHEN id_toko = $id_toko THEN stock ELSE 0 END) AS stok_toko_$id_toko, ";
+}
+
+$query .= "SUM(stock) AS total_stock
+    FROM stock
+    GROUP BY id_barang
+) ss ON ss.id_barang = b.id_barang
+
+LEFT JOIN (
+    SELECT 
+        id_barang, 
+        SUM(jumlah) AS penambahan_stok
+    FROM riwayat_stok
+    WHERE jenis = 'masuk' AND DATE(tanggal) = '$tanggal'
+    GROUP BY id_barang
+) rs ON rs.id_barang = b.id_barang
+
+ORDER BY b.nama_barang
+";
+
+// Eksekusi dan ambil data
+$result = mysqli_query($conn, $query);
+$data_stok = mysqli_fetch_all($result, MYSQLI_ASSOC);
 ?>
-<!-- Begin Page Content -->
+
 <div class="container mt-4">
-    <h4 class="mb-4">Laporan Stock</h4>
+    <h4 class="mb-4">Laporan Stok per Tanggal</h4>
     <form method="GET" class="mb-4">
         <div class="row g-3 align-items-end">
             <div class="col-auto">
                 <label for="tanggal" class="form-label">Pilih Tanggal</label>
-                <input type="date" class="form-control" id="tanggal" name="tanggal" value="<?= isset($_GET['tanggal']) ? $_GET['tanggal'] : '' ?>" required>
-            </div>
-            <div class="col-auto">
-                <label for="jenis" class="form-label">Jenis</label>
-                <select name="jenis" id="jenis" class="form-select">
-                    <option value="">Semua</option>
-                    <option value="masuk" <?= isset($_GET['jenis']) && $_GET['jenis'] === 'masuk' ? 'selected' : '' ?>>Masuk</option>
-                    <option value="keluar" <?= isset($_GET['jenis']) && $_GET['jenis'] === 'keluar' ? 'selected' : '' ?>>Keluar</option>
-                </select>
+                <input type="date" class="form-control" id="tanggal" name="tanggal" value="<?= htmlspecialchars($tanggal) ?>" required>
             </div>
             <div class="col-auto">
                 <button type="submit" class="btn btn-primary">Tampilkan Laporan</button>
             </div>
         </div>
     </form>
-    <form method="POST" action="../../../cetak_pdf.php" target="_blank">
-        <input type="hidden" name="tanggal" value="<?= $tanggal ?>">
+    
+    <form method="POST" action="cetak_pdf.php" target="_blank">
+        <input type="hidden" name="tanggal" value="<?= htmlspecialchars($tanggal) ?>">
         <button type="submit" class="btn btn-danger mt-3">Download PDF</button>
     </form>
 
-    <form class="mb-5" method="POST" action="cetak_excel.php" target="_blank">
-        <input type="hidden" name="tanggal" value="<?= $tanggal ?>">
-        <button type="submit" class="btn btn-success mt-3">Download Excel</button>
+    <form method="POST" action="cetak_excel.php" target="_blank">
+        <input type="hidden" name="tanggal" value="<?= htmlspecialchars($tanggal) ?>">
+        <button type="submit" class="btn btn-success mt-2">Download Excel</button>
     </form>
 
     <table class="table table-bordered table-striped">
         <thead>
-            <tr>
-                <th>No</th>
-                <th>Tanggal</th>
-                <th>Kode Barang</th>
-                <th>Nama Barang</th>
-                <th>Harga Pokok</th>
-                <th>Harga Jual</th>
-                <th>Laba</th>
-                <th>Stock Toko 1</th>
-                <th>Stock Toko 2</th>
-                <th>Stock Toko 3</th>
-                <th>Stock Total</th>
-                <th>Minimal Stock</th>
-                <th>Penambahan Stock</th>
-            </tr>
+        <tr>
+            <th>No</th>
+            <th>Kode Barang</th>
+            <th>Nama Barang</th>
+            <th>Harga Pokok</th>
+            <th>Harga Jual</th>
+            <th>Laba</th>
+            <?php foreach ($toko_list as $toko): ?>
+                <th><?= htmlspecialchars($toko['nama_toko']) ?></th>
+            <?php endforeach; ?>
+            <th>Total Stok</th>
+            <th>Minimal Stok</th>
+            <th>Penambahan Stok (<?= date('d-m-Y', strtotime($tanggal)) ?>)</th>
+        </tr>
         </thead>
         <tbody>
-            <?php
+        <?php
+        if (empty($data_stok)) {
+            echo '<tr><td colspan="' . (8 + count($toko_list)) . '" class="text-center">Data tidak ditemukan.</td></tr>';
+        } else {
             $no = 1;
-            if (empty($rows)) {
-                echo '<tr><td colspan="13" class="text-center">Data tidak ditemukan </td></tr>';
-                return;
-            }
-            foreach ($rows as $data):
-                $idb = $data['id_barang'];
-
-            ?>
+            foreach ($data_stok as $row): ?>
                 <tr>
                     <td><?= $no++ ?></td>
-                    <td><?= date('d-m-Y', strtotime($data['tanggal'])) ?></td>
-                    <td><?= $data['kode_barang'] ?></td>
-                    <td><?= $data['nama_barang'] ?></td>
-                    <td><?= number_format($data['harga_pokok']) ?></td>
-                    <td><?= number_format($data['harga_jual']) ?></td>
-                    <td><?= number_format($data['laba']) ?></td>
-                    <td><?= $data['stock_toko_1'] ?? 0 ?></td>
-                    <td><?= $data['stock_toko_2'] ?? 0 ?></td>
-                    <td><?= $data['stock_toko_3'] ?? 0 ?></td>
-                    <td><?= ($data['stock_toko_1'] ?? 0) + ($data['stock_toko_2'] ?? 0) + ($data['stock_toko_3'] ?? 0) ?></td>
-                    <td><?= $data['minimal_stock'] ?></td>
-                    <td><?= $data['jenis'] == 'masuk' ? '+' . $data['jumlah'] : '-' . $data['jumlah'] ?></td>
-
-
+                    <td><?= htmlspecialchars($row['kode_barang']) ?></td>
+                    <td><?= htmlspecialchars($row['nama_barang']) ?></td>
+                    <td><?= number_format($row['harga_pokok']) ?></td>
+                    <td><?= number_format($row['harga_jual']) ?></td>
+                    <td><?= number_format($row['laba']) ?></td>
+                    <?php foreach ($toko_list as $toko): ?>
+                        <td><?= $row["stok_toko_" . $toko['id_toko']] ?? 0 ?></td>
+                    <?php endforeach; ?>
+                    <td><?= $row['total_stock'] ?? 0 ?></td>
+                    <td><?= $row['minimal_stock'] ?></td>
+                    <td><?= $row['penambahan_stok'] ?></td>
                 </tr>
-            <?php endforeach; ?>
+            <?php endforeach;
+        }
+        ?>
         </tbody>
     </table>
-</div>
 
-<!-- /.container-fluid -->
+</div>
 
 <?php include('../layouts/footer.php') ?>

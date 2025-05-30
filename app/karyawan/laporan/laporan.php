@@ -30,7 +30,7 @@ if (isset($_GET['tanggal'])) {
         FROM riwayat_stok r
         JOIN barang b ON r.id_barang = b.id_barang
         LEFT JOIN stock s ON s.id_barang = b.id_barang AND s.id_toko = $id_toko
-        WHERE b.id_toko = $id_toko
+        WHERE s.id_toko = $id_toko
           AND DATE(r.tanggal) = '$tanggal' ";
 
     $result = mysqli_query($conn, $query);
