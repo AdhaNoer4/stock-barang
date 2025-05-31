@@ -37,7 +37,11 @@ $result = mysqli_query($conn, $query);
 
     <!-- Page Heading -->
     <h1 class="h3 mb-2 text-gray-800">Barang</h1>
-    <a href="tambah_barang.php" class="btn btn-primary mb-2">Tambah Data</a>
+    <div class="row">
+        <div class="col-md-6">
+            <a href="tambah_barang.php" class="btn btn-primary mb-2">Tambah Data</a>
+        </div>
+    </div>
 
     <!-- Filter Toko -->
     <div class="card shadow mb-4">
@@ -57,6 +61,7 @@ $result = mysqli_query($conn, $query);
                             <th>Harga Jual</th>
                             <th>Minimal Stock</th>
                             <th>Stock</th>
+                            <th>Nama Toko</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
@@ -76,6 +81,7 @@ $result = mysqli_query($conn, $query);
                                     <td><?= number_format($row['harga_jual']) ?></td>
                                     <td><?= $row['minimal_stock'] ?></td>
                                     <td><?= $row['stock'] ?></td>
+                                    <td><?= htmlspecialchars($row['nama_toko']) ?></td>
                                     <td>
                                         <a href="edit_barang.php?id=<?= $row['id_barang'] ?>" class="btn btn-success"><i class="far fa-edit"></i></a>
                                         <a href="hapus_barang.php?id=<?= $row['id_barang'] ?>" class="btn btn-danger tombol-hapus"><i class="far fa-trash-alt"></i></a>
