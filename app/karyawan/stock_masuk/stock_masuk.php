@@ -5,7 +5,18 @@ include('../layouts/header.php');
 
 
 $barang = mysqli_query($conn, "SELECT b.nama_barang, s.id_barang FROM stock s JOIN barang b ON s.id_barang = b.id_barang WHERE id_toko = '$_SESSION[id_toko]' ORDER BY b.nama_barang ASC");
-$result = mysqli_query($conn, "SELECT rs.*,s.id_barang, u.nama, b.nama_barang FROM riwayat_stok rs JOIN stock s ON rs.id_barang = s.id_barang JOIN user u ON rs.id_user = u.id_user JOIN barang b ON rs.id_barang = b.id_barang WHERE jenis = 'masuk' AND tanggal = CURDATE() ORDER BY rs.tanggal DESC");
+$id_toko = $_SESSION['id_toko'];
+
+$result = mysqli_query($conn, "
+    SELECT rs.*, u.nama, b.nama_barang 
+    FROM riwayat_stok rs 
+    JOIN user u ON rs.id_user = u.id_user 
+    JOIN barang b ON rs.id_barang = b.id_barang 
+    WHERE rs.jenis = 'masuk' 
+      AND rs.tanggal = CURDATE() 
+      AND rs.id_toko = $id_toko
+    ORDER BY rs.tanggal DESC
+");
 ?>
 <!-- Begin Page Content -->
 <div class="container-fluid">
