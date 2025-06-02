@@ -9,12 +9,13 @@ if (!isset($_SESSION["login"])) {
 require_once('../../../config.php');
 
 if (isset($_GET['id'])) {
-    $idbarang = intval($_GET['id']);
+    $idstock = intval($_GET['id']);
+    $idbarang = intval($_GET['id_barang']);
     $id_toko = $_SESSION['id_toko'];
 
     // Hapus stock barang dari toko ini saja
-    $hapus = mysqli_query($conn, "DELETE FROM stock WHERE id_barang = $idbarang AND id_toko = $id_toko");
-
+    $hapus = mysqli_query($conn, "DELETE FROM stock WHERE id_stock = $idstock ");
+    $hapus_barang = mysqli_query($conn, "DELETE FROM barang WHERE id_barang = $idbarang");
     if ($hapus && mysqli_affected_rows($conn) > 0) {
         $_SESSION['berhasil'] = "Barang berhasil dihapus dari stok toko!";
     } else {

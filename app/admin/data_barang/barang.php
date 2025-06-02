@@ -20,7 +20,8 @@ $query = "
         barang.harga_pokok, 
         barang.harga_jual, 
         barang.minimal_stock, 
-        stock.stock, 
+        stock.stock,
+        stock.id_stock, 
         stock.id_toko, 
         toko.nama_toko
     FROM barang
@@ -81,10 +82,10 @@ $result = mysqli_query($conn, $query);
                                     <td><?= number_format($row['harga_jual']) ?></td>
                                     <td><?= $row['minimal_stock'] ?></td>
                                     <td><?= $row['stock'] ?></td>
-                                    <td><?= htmlspecialchars($row['nama_toko']) ?></td>
+                                    <td><?= $row['nama_toko'] ?></td>
                                     <td>
                                         <a href="edit_barang.php?id=<?= $row['id_barang'] ?>" class="btn btn-success"><i class="far fa-edit"></i></a>
-                                        <a href="hapus_barang.php?id=<?= $row['id_barang'] ?>" class="btn btn-danger tombol-hapus"><i class="far fa-trash-alt"></i></a>
+                                        <a href="hapus_barang.php?id=<?= $row['id_stock'] ?>&id_barang=<?= $row['id_barang'] ?>" class="btn btn-danger tombol-hapus"><i class="far fa-trash-alt"></i></a>
                                     </td>
                                 </tr>
                             <?php endwhile; ?>
