@@ -7,8 +7,9 @@ if (!isset($_SESSION["login"])) {
     header("Location: ../../auth/login.php?pesan=tolak_akses");
     exit;
 }
-require_once('../../../config.php'); // koneksi
-require '../../../vendor/autoload.php'; // jika pakai Composer
+
+require_once('../../../config.php'); // koneksi DB
+require '../../../vendor/autoload.php'; // load library PhpSpreadsheet
 
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
@@ -17,66 +18,55 @@ if (isset($_POST['import'])) {
 
     if ($file) {
         $spreadsheet = IOFactory::load($file);
-        $sheet = $spreadsheet->getActiveSheet()->toArray(null, true, true, true);
+        $sheet = $spreadsheet->getActiveSheet()->toArray(null, true, true, true); // A, B, C, D
 
-        $baris_mulai = 2; // baris 1 = judul kolom
+        $baris_mulai = 2; // baris 1 = judul kolom Excel
         foreach ($sheet as $index => $row) {
             if ($index < $baris_mulai) continue;
 
-            // Misal kolom Excel: A = kode_barang, B = nama_barang, C = jumlah, D = id_toko
-            $kode_barang = $row['A'];
-            $nama_barang = $row['B'];
+            // Kolom Excel: A = kode_barang, B = nama_barang, C = harga_pokok, D = harga_jual
+            $kode_barang = trim($row['A']);
+            $nama_barang = trim($row['B']);
             $harga_pokok = floatval($row['C']);
             $harga_jual = floatval($row['D']);
             $laba = $harga_jual - $harga_pokok;
-            $minimal_stock = 0; // jika ada kolom minimal stock
+            $minimal_stock = 0;
 
+            // Validasi sederhana
             if (empty($kode_barang) || empty($nama_barang) || $harga_pokok <= 0 || $harga_jual <= 0) {
-                continue; // skip baris, jangan exit semua
+                continue; // Skip baris tidak valid
             }
 
-            // // Cari ID barang
-            // $barang = mysqli_query($conn, "SELECT id_barang FROM barang WHERE kode_barang = '$kode_barang'");
-            // if (mysqli_num_rows($barang) == 0) {
-            //     // Tambah barang baru jika belum ada
-            //     mysqli_query($conn, "INSERT INTO barang (kode_barang, nama_barang, harga_pokok, harga_jual, laba, minimal_stock)
-            // VALUES ('$kode_barang', '$nama_barang', $harga_pokok, $harga_jual, $laba, $minimal_stock)");
-            //     $id_barang = mysqli_insert_id($conn);
-            // } else {
-            //     $id_barang = mysqli_fetch_assoc($barang)['id_barang'];
-            // }
-
-            // Cek kode barang agar tidak duplikat
-            $cek = mysqli_query($conn, "SELECT * FROM barang WHERE kode_barang = '$kode_barang'");
+            // Cek apakah kode barang sudah ada
+            $cek = mysqli_query($conn, "SELECT id_barang FROM barang WHERE kode_barang = '$kode_barang'");
             if (mysqli_num_rows($cek) === 0) {
-
-                // Tambahkan ke tabel barang
+                // Tambah barang baru
                 mysqli_query($conn, "INSERT INTO barang (kode_barang, nama_barang, harga_pokok, harga_jual, laba, minimal_stock)
-            VALUES ('$kode_barang', '$nama_barang', $harga_pokok, $harga_jual, $laba, $minimal_stock)");
+                    VALUES ('$kode_barang', '$nama_barang', $harga_pokok, $harga_jual, $laba, $minimal_stock)");
 
                 $id_barang = mysqli_insert_id($conn);
 
-                // Ambil semua toko
+                // Tambah stock untuk semua toko
                 $toko_result = mysqli_query($conn, "SELECT id_toko FROM toko");
                 while ($toko = mysqli_fetch_assoc($toko_result)) {
                     $id_toko = $toko['id_toko'];
 
-                    // Cek apakah sudah ada entry stok untuk kombinasi ini
+                    // Cek jika kombinasi id_barang dan id_toko belum ada
                     $cek_stock = mysqli_query($conn, "SELECT * FROM stock WHERE id_barang = $id_barang AND id_toko = $id_toko");
                     if (mysqli_num_rows($cek_stock) === 0) {
                         mysqli_query($conn, "INSERT INTO stock (id_barang, id_toko, stock) VALUES ($id_barang, $id_toko, 0)");
                     }
                 }
-
-                // Redirect untuk hindari submit ulang
-                header("Location: barang.php?pesan=berhasil");
-                exit;
-            } else {
-                $_SESSION['berhasil'] = "Import data stock berhasil!";
             }
+            // Jika sudah ada, abaikan atau bisa diupdate tergantung kebutuhan
         }
 
         $_SESSION['berhasil'] = "Import data stock berhasil!";
         header('Location: barang.php');
+        exit;
+    } else {
+        $_SESSION['gagal'] = "File Excel tidak ditemukan.";
+        header('Location: barang.php');
+        exit;
     }
 }
