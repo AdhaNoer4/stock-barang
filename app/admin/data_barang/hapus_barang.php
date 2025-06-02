@@ -10,15 +10,18 @@ require_once('../../../config.php');
 
 if (isset($_GET['id'])) {
     $idbarang = intval($_GET['id']);
+    $id_toko = $_SESSION['id_toko'];
 
-    $hapus = mysqli_query($conn, "DELETE FROM barang WHERE id_barang = $idbarang");
+    // Hapus stock barang dari toko ini saja
+    $hapus = mysqli_query($conn, "DELETE FROM stock WHERE id_barang = $idbarang AND id_toko = $id_toko");
 
-    if ($hapus) {
-        $_SESSION['berhasil'] = "Barang berhasil dihapus!";
+    if ($hapus && mysqli_affected_rows($conn) > 0) {
+        $_SESSION['berhasil'] = "Barang berhasil dihapus dari stok toko!";
     } else {
-        $_SESSION['validasi'] = "Gagal menghapus barang.";
+        $_SESSION['validasi'] = "Gagal menghapus stok barang untuk toko ini.";
     }
 }
+
 
 header('Location: barang.php');
 exit;

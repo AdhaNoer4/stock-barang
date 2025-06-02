@@ -3,9 +3,9 @@ require('proses_masuk.php');
 $judul = "Stock Masuk";
 include('../layouts/header.php');
 
-
-$barang = mysqli_query($conn, "SELECT b.nama_barang, s.id_barang FROM stock s JOIN barang b ON s.id_barang = b.id_barang WHERE id_toko = '$_SESSION[id_toko]' ORDER BY b.nama_barang ASC");
 $id_toko = $_SESSION['id_toko'];
+$barang = mysqli_query($conn, "SELECT b.nama_barang, s.id_barang FROM stock s JOIN barang b ON s.id_barang = b.id_barang WHERE id_toko = '$_SESSION[id_toko]' ORDER BY b.nama_barang ASC");
+
 
 $result = mysqli_query($conn, "
     SELECT rs.*, u.nama, b.nama_barang 

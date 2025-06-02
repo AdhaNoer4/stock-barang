@@ -67,9 +67,9 @@ if (!empty($id_toko_terpilih)) {
 
             <!-- Form Stock Masuk -->
             <?php if (!empty($id_toko_terpilih)): ?>
-                <form method="POST" action="proses_masuk.php">
-                    <div class="row">
-                        <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-6">
+                        <form method="POST" action="proses_masuk.php">
                             <div class="card">
                                 <div class="card-body">
                                     <input type="hidden" name="id_toko" value="<?= $id_toko_terpilih ?>">
@@ -102,9 +102,11 @@ if (!empty($id_toko_terpilih)) {
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </form>
                     </div>
-                </form>
+                    
+                </div>
+
             <?php endif; ?>
         </div>
     </div>
@@ -133,7 +135,8 @@ if (!empty($id_toko_terpilih)) {
                                 <td colspan="6" class="text-center">Data kosong, silakan tambah data baru.</td>
                             </tr>
                         <?php else: ?>
-                            <?php $no = 1; while ($riwayat = mysqli_fetch_assoc($result)) : ?>
+                            <?php $no = 1;
+                            while ($riwayat = mysqli_fetch_assoc($result)) : ?>
                                 <tr class="text-center">
                                     <td><?= $no++ ?></td>
                                     <td><?= $riwayat['tanggal']; ?></td>
