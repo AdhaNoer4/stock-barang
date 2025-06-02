@@ -5,7 +5,17 @@ include('../layouts/header.php');
 
 
 $barang = mysqli_query($conn, "SELECT b.nama_barang, s.id_barang FROM stock s JOIN barang b ON s.id_barang = b.id_barang WHERE id_toko = '$_SESSION[id_toko]' ORDER BY b.nama_barang ASC");
-$result = mysqli_query($conn, "SELECT rs.*,s.id_barang, u.nama, b.nama_barang FROM riwayat_stok rs JOIN stock s ON rs.id_barang = s.id_barang JOIN user u ON rs.id_user = u.id_user JOIN barang b ON rs.id_barang = b.id_barang WHERE jenis = 'keluar' AND tanggal = CURDATE() ORDER BY rs.tanggal DESC");
+$result = mysqli_query($conn, "
+    SELECT rs.*, u.nama, b.nama_barang
+    FROM riwayat_stok rs
+    JOIN user u ON rs.id_user = u.id_user
+    JOIN barang b ON rs.id_barang = b.id_barang
+    WHERE rs.jenis = 'keluar'
+      AND rs.tanggal = CURDATE()
+      AND rs.id_toko = '{$_SESSION['id_toko']}'
+    ORDER BY rs.tanggal DESC
+");
+
 ?>
 <!-- Begin Page Content -->
 <div class="container-fluid">
@@ -14,7 +24,7 @@ $result = mysqli_query($conn, "SELECT rs.*,s.id_barang, u.nama, b.nama_barang FR
     <h1 class="h3 mb-2 text-gray-800"><?= $judul; ?></h1>
     <div class="page-body">
         <div class="container-xl">
-            <form method="POST" enctype="multipart/form-data">
+            <form method="POST">
                 <div class="row">
                     <div class="col-md-6">
                         <div class="card">

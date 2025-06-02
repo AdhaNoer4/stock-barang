@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit'])) {
     $id_toko = isset($_POST['id_toko']) ? intval($_POST['id_toko']) : null;
     $id_user = $_SESSION['id_user'];
     
-    $icon_validasi = "<svg ...svg code... ></svg>"; // singkat untuk tampilan
+    $icon_validasi = "<<svg  xmlns='http://www.w3.org/2000/svg'  width='24'  height='24'  viewBox='0 0 24 24'  fill='none'  stroke='currentColor'  stroke-width='2'  stroke-linecap='round'  stroke-linejoin='round'  class='icon icon-tabler icons-tabler-outline icon-tabler-check'><path stroke='none' d='M0 0h24v24H0z' fill='none'/><path d='M5 12l5 5l10 -10' /></svg>"; // singkat untuk tampilan
     
     $pesan_kesalahan = [];
 
