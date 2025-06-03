@@ -16,24 +16,26 @@ if (isset($_GET['tanggal'])) {
     $jenis = isset($_GET['jenis']) ? $_GET['jenis'] : '';
     $query = "
         SELECT 
-            r.tanggal, 
-            b.kode_barang, 
-            b.nama_barang, 
-            b.harga_pokok, 
-            b.harga_jual, 
-            b.laba, 
-            b.minimal_stock,
-            b.id_barang,
-            r.jumlah,
-            r.jenis,
-            s.stock
-        FROM riwayat_stok r
-        JOIN barang b ON r.id_barang = b.id_barang
-        LEFT JOIN stock s ON s.id_barang = b.id_barang AND s.id_toko = $id_toko
-        WHERE s.id_toko = $id_toko
-          AND DATE(r.tanggal) = '$tanggal' ";
+    r.tanggal, 
+    b.kode_barang, 
+    b.nama_barang, 
+    b.harga_pokok, 
+    b.harga_jual, 
+    b.laba, 
+    b.minimal_stock,
+    b.id_barang,
+    r.jumlah,
+    r.jenis,
+    s.stock,
+    s.id_toko
+FROM riwayat_stok r
+LEFT JOIN barang b ON r.id_barang = b.id_barang
+LEFT JOIN stock s ON s.id_barang = b.id_barang AND s.id_toko = $id_toko
+WHERE r.id_toko = $id_toko AND DATE(r.tanggal) = '$tanggal'
 
-    // Filter jenis jika dipilihAdd commentMore actions
+";
+
+    // Filter jenis jika dipilih
     if ($jenis !== '') {
         $query .= " AND r.jenis = '$jenis'";
     }
@@ -64,7 +66,7 @@ if (isset($_GET['tanggal'])) {
             </div>
         </div>
     </form>
-    <form method="POST" action="../../../cetak_pdf.php" target="_blank">
+    <form method="POST" action="cetak_pdf.php" target="_blank">
         <input type="hidden" name="tanggal" value="<?= $tanggal ?>">
         <button type="submit" class="btn btn-danger mt-3">Download PDF</button>
     </form>
