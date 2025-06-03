@@ -9,11 +9,11 @@ if (!isset($_SESSION["login"])) {
 require_once('../../../config.php');
 include('../layouts/header.php');
 
-$id_toko = $_SESSION['id_toko']; 
+$id_toko = $_SESSION['id_toko'];
 
 if (isset($_GET['tanggal'])) {
     $tanggal = $_GET['tanggal'];
-
+    $jenis = isset($_GET['jenis']) ? $_GET['jenis'] : '';
     $query = "
         SELECT 
             r.tanggal, 
@@ -33,6 +33,11 @@ if (isset($_GET['tanggal'])) {
         WHERE s.id_toko = $id_toko
           AND DATE(r.tanggal) = '$tanggal' ";
 
+    // Filter jenis jika dipilihAdd commentMore actions
+    if ($jenis !== '') {
+        $query .= " AND r.jenis = '$jenis'";
+    }
+
     $result = mysqli_query($conn, $query);
     $rows = mysqli_fetch_all($result, MYSQLI_ASSOC);
 }
@@ -45,6 +50,14 @@ if (isset($_GET['tanggal'])) {
             <div class="col-auto">
                 <label for="tanggal" class="form-label">Pilih Tanggal</label>
                 <input type="date" class="form-control" id="tanggal" name="tanggal" value="<?= isset($_GET['tanggal']) ? $_GET['tanggal'] : '' ?>" required>
+            </div>
+            <div class="col-auto">
+                <label for="jenis" class="form-label">Jenis</label>
+                <select name="jenis" id="jenis" class="form-select">
+                    <option value="">Semua</option>
+                    <option value="masuk" <?= isset($_GET['jenis']) && $_GET['jenis'] === 'masuk' ? 'selected' : '' ?>>Masuk</option>Add commentMore actions
+                    <option value="keluar" <?= isset($_GET['jenis']) && $_GET['jenis'] === 'keluar' ? 'selected' : '' ?>>Keluar</option>
+                </select>
             </div>
             <div class="col-auto">
                 <button type="submit" class="btn btn-primary">Tampilkan Laporan</button>
@@ -85,7 +98,7 @@ if (isset($_GET['tanggal'])) {
             }
             foreach ($rows as $data):
                 $idb = $data['id_barang'];
-                
+
             ?>
                 <tr>
                     <td><?= $no++ ?></td>
@@ -97,7 +110,7 @@ if (isset($_GET['tanggal'])) {
                     <td><?= number_format($data['laba']) ?></td>
                     <td><?= $data['stock'] ?? 0 ?></td>
                     <td><?= $data['minimal_stock'] ?></td>
-                    <td><?= $data['jenis'] == 'masuk' ? '+' . $data['jumlah'] : '0' ?></td>
+                    <td><?= $data['jenis'] == 'masuk' ? '+' . $data['jumlah'] : '-' . $data['jumlah'] ?></td>
 
                 </tr>
             <?php endforeach; ?>
