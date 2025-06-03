@@ -76,13 +76,14 @@ if (!empty($id_toko_terpilih)) {
 
                                     <div class="mb-3">
                                         <label for="id_barang">Nama Barang</label>
-                                        <select name="id_barang" class="form-control" required>
-                                            <option value="">--Pilih Barang--</option>
+                                        <select name="id_barang" class="form-control select-barang" required>
+                                            <option value="">--Cari Barang--</option>
                                             <?php while ($row = mysqli_fetch_assoc($barang)): ?>
                                                 <option value="<?= $row['id_barang'] ?>"><?= $row['nama_barang'] ?></option>
                                             <?php endwhile; ?>
                                         </select>
                                     </div>
+
 
                                     <div class="mb-3">
                                         <label for="jumlah">Jumlah Masuk</label>
