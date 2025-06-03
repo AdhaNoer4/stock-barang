@@ -41,6 +41,7 @@ $result = mysqli_query($conn, $query);
     <div class="row">
         <div class="col-md-6">
             <a href="tambah_barang.php" class="btn btn-primary mb-2">Tambah Data</a>
+            <a href="export_barang.php" class="btn btn-success mb-2">Export Excel</a>
         </div>
     </div>
 
