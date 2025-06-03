@@ -9,23 +9,28 @@ $judul = "Dashboard";
 include('../layouts/header.php');
 require_once('../../../config.php');
 
+
 // query untuk menghitung total barang
 $total_barang_query = mysqli_query($conn, "SELECT COUNT(*) AS total_barang FROM stock");
 $total_barang_data = mysqli_fetch_assoc($total_barang_query);
 $total_barang = $total_barang_data['total_barang'];
 
+
 // query untuk menghitung total stock menipis
-$minimal_stock_query = mysqli_query($conn, "SELECT minimal_stock FROM barang");
-$minimal_stock_data = mysqli_fetch_assoc($minimal_stock_query);
-$minimal_stock = $minimal_stock_data['minimal_stock'];
-$total_stock_menipis_query = mysqli_query($conn, "SELECT COUNT(*) AS total_stock_menipis FROM stock WHERE stock <= $minimal_stock");
+$total_stock_menipis_query = mysqli_query($conn, "
+    SELECT COUNT(*) AS total_stock_menipis 
+    FROM stock s
+    JOIN barang b ON s.id_barang = b.id_barang 
+    WHERE s.stock <= b.minimal_stock
+");
+
 $total_stock_menipis_data = mysqli_fetch_assoc($total_stock_menipis_query);
 $total_stock_menipis = $total_stock_menipis_data['total_stock_menipis'];
 
 // query untuk menghitung total re-stock
 $total_restock_query = mysqli_query($conn, "SELECT COUNT(*) AS total_restock FROM masuk");
 $total_restock_data = mysqli_fetch_assoc($total_restock_query);
-$total_restock = $total_restock_data['total_restock'];
+$total_restock =$total_restock_data['total_restock'];
 
 // query untuk menghitung total Aktivitas
 $total_aktivitas_query = mysqli_query($conn, "SELECT COUNT(*) AS total_aktivitas FROM riwayat_stok WHERE jenis = 'masuk' OR jenis = 'keluar'");

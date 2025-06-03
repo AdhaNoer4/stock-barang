@@ -41,7 +41,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['simpan_barang'])) {
         }
 
         // Redirect untuk hindari submit ulang
-        header("Location: barang.php?pesan=berhasil");
+        $_SESSION['berhasil'] = 'Barang berhasil ditambahkan!';
+        header("Location: barang.php");
         exit;
     } else {
         echo "<script>alert('Kode barang sudah ada!');</script>";

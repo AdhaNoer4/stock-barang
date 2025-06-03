@@ -20,10 +20,6 @@ if (isset($_POST['submit'])) {
 
     // Cek apakah ada upload logo baru
     if ($_FILES['logo']['name'] !== '') {
-        $fileName = time() . '-' . $_FILES['logo']['name'];
-        $targetDir = "../../../assets/img/";
-        move_uploaded_file($_FILES['logo']['tmp_name'], $targetDir . $fileName);
-
         $query = "UPDATE pengaturan SET logo = ?, tema_bootstrap = ? WHERE id = 1";
         $stmt = mysqli_prepare($conn, $query);
         mysqli_stmt_bind_param($stmt, "ss", $fileName, $tema);
@@ -51,16 +47,7 @@ if (isset($_POST['submit'])) {
         <div class="card mb-5">
             <div class="card-body">
                 <form action="" method="POST" enctype="multipart/form-data">
-                    <label for="logo">Logo / Favicon</label>
-                    <div class="input-group mb-3">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text" id="inputGroupFileAddon01">Upload</span>
-                        </div>
-                        <div class="custom-file">
-                            <input type="file" name="logo" class="custom-file-input" id="inputGroupFile01" aria-describedby="inputGroupFileAddon01">
-                            <label class="custom-file-label" for="inputGroupFile01">Choose file</label>
-                        </div>
-                    </div>
+
 
                     <div class="mb-3">
                         <label for="tema_bootstrap">Tema Warna</label>
