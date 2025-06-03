@@ -49,62 +49,71 @@ $result = mysqli_query($conn, $query);
     <!-- Page Heading -->
     <h1 class="h3 mb-2 text-gray-800">Barang</h1>
 
+    <div class="row">
+        <div class="col-md-6">
+            <a href="tambah_barang.php" class="btn btn-primary mb-2">Tambah Data</a>
+            <a href="export_barang.php" class="btn btn-success mb-2">Export Excel</a>
+        </div>
+    </div>
+
+
     <div class="row mb-3">
         <div class="col-md-6">
             <a href="tambah_barang.php" class="btn btn-primary">Tambah Data</a>
         </div>
 
-    <!-- Data Barang -->
-    <div class="card shadow mb-4">
-        <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Data Barang</h6>
-        </div>
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-                    <thead class="text-center">
-                        <tr>
-                            <th>No.</th>
-                            <th>Kode Barang</th>
-                            <th>Nama Barang</th>
-                            <th>Harga Pokok</th>
-                            <th>Harga Jual</th>
-                            <th>Minimal Stock</th>
-                            <th>Stock</th>
-                            <th>Nama Toko</th>
-                            <th>Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php if (mysqli_num_rows($result) === 0): ?>
+        <!-- Data Barang -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Data Barang</h6>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                        <thead class="text-center">
                             <tr>
-                                <td colspan="9" class="text-center">Data tidak ditemukan.</td>
+                                <th>No.</th>
+                                <th>Kode Barang</th>
+                                <th>Nama Barang</th>
+                                <th>Harga Pokok</th>
+                                <th>Harga Jual</th>
+                                <th>Minimal Stock</th>
+                                <th>Stock</th>
+                                <th>Nama Toko</th>
+                                <th>Aksi</th>
                             </tr>
-                        <?php else: ?>
-                            <?php $no = 1; while ($row = mysqli_fetch_assoc($result)) : ?>
-                                <tr class="text-center">
-                                    <td><?= $no++ ?></td>
-                                    <td><?= htmlspecialchars($row['kode_barang']) ?></td>
-                                    <td><?= htmlspecialchars($row['nama_barang']) ?></td>
-                                    <td><?= number_format($row['harga_pokok']) ?></td>
-                                    <td><?= number_format($row['harga_jual']) ?></td>
-                                    <td><?= $row['minimal_stock'] ?></td>
-                                    <td><?= $row['stock'] ?></td>
-                                    <td><?= $row['nama_toko'] ?></td>
-                                    <td>
-                                        <a href="edit_barang.php?id=<?= $row['id_barang'] ?>" class="btn btn-success btn-sm"><i class="far fa-edit"></i></a>
-                                        <a href="hapus_barang.php?id=<?= $row['id_stock'] ?>&id_barang=<?= $row['id_barang'] ?>" class="btn btn-danger btn-sm tombol-hapus"><i class="far fa-trash-alt"></i></a>
-                                    </td>
+                        </thead>
+                        <tbody>
+                            <?php if (mysqli_num_rows($result) === 0): ?>
+                                <tr>
+                                    <td colspan="9" class="text-center">Data tidak ditemukan.</td>
                                 </tr>
-                            <?php endwhile; ?>
-                        <?php endif; ?>
-                    </tbody>
-                </table>
+                            <?php else: ?>
+                                <?php $no = 1;
+                                while ($row = mysqli_fetch_assoc($result)) : ?>
+                                    <tr class="text-center">
+                                        <td><?= $no++ ?></td>
+                                        <td><?= htmlspecialchars($row['kode_barang']) ?></td>
+                                        <td><?= htmlspecialchars($row['nama_barang']) ?></td>
+                                        <td><?= number_format($row['harga_pokok']) ?></td>
+                                        <td><?= number_format($row['harga_jual']) ?></td>
+                                        <td><?= $row['minimal_stock'] ?></td>
+                                        <td><?= $row['stock'] ?></td>
+                                        <td><?= $row['nama_toko'] ?></td>
+                                        <td>
+                                            <a href="edit_barang.php?id=<?= $row['id_barang'] ?>" class="btn btn-success btn-sm"><i class="far fa-edit"></i></a>
+                                            <a href="hapus_barang.php?id=<?= $row['id_stock'] ?>&id_barang=<?= $row['id_barang'] ?>" class="btn btn-danger btn-sm tombol-hapus"><i class="far fa-trash-alt"></i></a>
+                                        </td>
+                                    </tr>
+                                <?php endwhile; ?>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
+
     </div>
+    <!-- /.container-fluid -->
 
-</div>
-<!-- /.container-fluid -->
-
-<?php include "../layouts/footer.php" ?>
+    <?php include "../layouts/footer.php" ?>
