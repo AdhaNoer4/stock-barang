@@ -34,7 +34,7 @@ if (!empty($id_toko_terpilih)) {
         FROM riwayat_stok rs
         JOIN barang b ON rs.id_barang = b.id_barang
         JOIN user u ON rs.id_user = u.id_user
-        WHERE rs.jenis = 'masuk' 
+        WHERE rs.jenis = 'keluar' 
           AND rs.tanggal = CURDATE()
           AND rs.id_toko = '$id_toko_terpilih'
         ORDER BY rs.tanggal DESC
