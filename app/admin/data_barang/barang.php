@@ -58,9 +58,7 @@ $result = mysqli_query($conn, $query);
 
 
     <div class="row mb-3">
-        <div class="col-md-6">
-            <a href="tambah_barang.php" class="btn btn-primary">Tambah Data</a>
-        </div>
+
 
         <!-- Data Barang -->
         <div class="card shadow mb-4">
