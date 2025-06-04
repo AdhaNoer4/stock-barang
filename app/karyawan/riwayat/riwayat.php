@@ -11,13 +11,14 @@ include('../layouts/header.php');
 require_once('../../../config.php');
 $id_toko = $_SESSION ['id_toko'];
 
-$result = mysqli_query($conn, "SELECT rs.*, s.id_barang, u.nama, b.nama_barang 
-FROM riwayat_stok rs 
-JOIN stock s ON rs.id_barang = s.id_barang 
-JOIN user u ON rs.id_user = u.id_user 
-JOIN barang b ON rs.id_barang = b.id_barang 
-WHERE jenis = 'masuk' 
-ORDER BY rs.tanggal DESC");
+$result = mysqli_query($conn, "SELECT rs.*, u.nama, b.nama_barang 
+    FROM riwayat_stok rs 
+    JOIN user u ON rs.id_user = u.id_user 
+    JOIN barang b ON rs.id_barang = b.id_barang 
+    WHERE 
+      rs.tanggal = CURDATE() 
+      AND rs.id_toko = $id_toko
+    ORDER BY rs.tanggal DESC");
 
 if (!$result) {
     die("Query Error: " . mysqli_error($conn));

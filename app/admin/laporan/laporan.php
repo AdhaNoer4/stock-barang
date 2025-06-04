@@ -75,7 +75,7 @@ $data_stok = mysqli_fetch_all($result, MYSQLI_ASSOC);
 
 <div class="container mt-4">
     <h4 class="mb-4">Laporan Stok per Tanggal</h4>
-    <form method="GET" class="mb-4">
+    <form method="GET" class="mb-2">
         <div class="row g-3 align-items-end">
             <div class="col-auto">
                 <label for="tanggal" class="form-label">Pilih Tanggal</label>
@@ -97,7 +97,7 @@ $data_stok = mysqli_fetch_all($result, MYSQLI_ASSOC);
         <button type="submit" class="btn btn-success mt-2">Download Excel</button>
     </form>
 
-    <table class="table table-bordered table-striped">
+    <table class="table table-bordered table-striped mt-3">
         <thead>
             <tr>
                 <th>No</th>
