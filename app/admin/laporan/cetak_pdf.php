@@ -8,6 +8,18 @@ $tanggal_input = $_POST['tanggal'] ?? date('Y-m-d');
 $mpdf = new Mpdf(['mode' => 'utf-8', 'format' => 'A4']);
 $mpdf->SetTitle('Laporan Stok Barang - ' . $tanggal_input);
 
+// Ambil daftar toko
+$sql_toko = "SELECT id_toko, nama_toko FROM toko ORDER BY id_toko";
+$result_toko = mysqli_query($conn, $sql_toko);
+
+$toko_list = [];
+while ($row = mysqli_fetch_assoc($result_toko)) {
+    $toko_list[] = [
+        'id_toko' => $row['id_toko'],
+        'nama_toko' => $row['nama_toko'],
+    ];
+}
+
 // Ambil semua data barang
 $sql_barang = "SELECT * FROM barang ORDER BY id_barang";
 $result_barang = mysqli_query($conn, $sql_barang);
@@ -16,6 +28,8 @@ $result_barang = mysqli_query($conn, $sql_barang);
 $data = [];
 while ($row = mysqli_fetch_assoc($result_barang)) {
     $id_barang = $row['id_barang'];
+
+    // Inisialisasi data barang
     $data[$id_barang] = [
         'kode_barang' => $row['kode_barang'],
         'nama_barang' => $row['nama_barang'],
@@ -23,12 +37,15 @@ while ($row = mysqli_fetch_assoc($result_barang)) {
         'harga_jual' => $row['harga_jual'],
         'laba' => $row['harga_jual'] - $row['harga_pokok'],
         'minimal_stock' => $row['minimal_stock'],
-        'stock_toko_1' => 0,
-        'stock_toko_2' => 0,
-        'stock_toko_3' => 0,
         'perubahan_stock' => 0,
         'tanggal' => $tanggal_input,
     ];
+
+    // Inisialisasi stock per toko
+    foreach ($toko_list as $toko) {
+        $id_toko = $toko['id_toko'];
+        $data[$id_barang]["stock_toko_$id_toko"] = 0;
+    }
 }
 
 // Ambil data stok semua toko
@@ -38,7 +55,6 @@ while ($row = mysqli_fetch_assoc($result_stok)) {
     $id_barang = $row['id_barang'];
     $id_toko = $row['id_toko'];
     $stok = $row['stock'];
-
 
     if (isset($data[$id_barang])) {
         $data[$id_barang]["stock_toko_$id_toko"] = $stok;
@@ -79,10 +95,14 @@ $html = '
             <th>Nama Barang</th>
             <th>Harga Pokok</th>
             <th>Harga Jual</th>
-            <th>Laba</th>
-            <th>Stock Toko 1</th>
-            <th>Stock Toko 2</th>
-            <th>Stock Toko 3</th>
+            <th>Laba</th>';
+
+// Header dinamis per toko
+foreach ($toko_list as $toko) {
+    $html .= '<th>Stock ' . htmlspecialchars($toko['nama_toko']) . '</th>';
+}
+
+$html .= '
             <th>Stock Total</th>
             <th>Minimal Stock</th>
             <th>Penambahan Stock</th>
@@ -92,7 +112,13 @@ $html = '
 
 $no = 1;
 foreach ($data as $item) {
-    $total_stock = $item['stock_toko_1'] + $item['stock_toko_2'] + $item['stock_toko_3'];
+    // Hitung total stock dinamis
+    $total_stock = 0;
+    foreach ($toko_list as $toko) {
+        $id_toko = $toko['id_toko'];
+        $total_stock += $item["stock_toko_$id_toko"];
+    }
+
     $html .= "<tr>
         <td>{$no}</td>
         <td>{$item['tanggal']}</td>
@@ -100,10 +126,15 @@ foreach ($data as $item) {
         <td>{$item['nama_barang']}</td>
         <td>Rp " . number_format($item['harga_pokok'], 0, ',', '.') . "</td>
         <td>Rp " . number_format($item['harga_jual'], 0, ',', '.') . "</td>
-        <td>Rp " . number_format($item['laba'], 0, ',', '.') . "</td>
-        <td>{$item['stock_toko_1']}</td>
-        <td>{$item['stock_toko_2']}</td>
-        <td>{$item['stock_toko_3']}</td>
+        <td>Rp " . number_format($item['laba'], 0, ',', '.') . "</td>";
+
+    // Isi stock per toko
+    foreach ($toko_list as $toko) {
+        $id_toko = $toko['id_toko'];
+        $html .= '<td>' . $item["stock_toko_$id_toko"] . '</td>';
+    }
+
+    $html .= "
         <td>{$total_stock}</td>
         <td>{$item['minimal_stock']}</td>
         <td>{$item['perubahan_stock']}</td>
