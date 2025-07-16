@@ -12,32 +12,61 @@ $judul = "Data Barang";
 include('../layouts/header.php');
 require_once('../../../config.php');
 
+$keyword = isset($_GET['keyword']) ? mysqli_real_escape_string($conn, $_GET['keyword']) : '';
+$filter_toko = isset($_GET['filter_toko']) ? (int)$_GET['filter_toko'] : 0;
+$limit = 10;
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$offset = ($page - 1) * $limit;
+
+// Count total rows (dihitung berdasarkan hasil JOIN)
+$countQuery = "
+    SELECT COUNT(*) AS total
+    FROM barang b
+    LEFT JOIN stock s ON b.id_barang = s.id_barang
+    LEFT JOIN toko t ON s.id_toko = t.id_toko
+    WHERE 1=1
+";
+if ($filter_toko > 0) {
+    $countQuery .= " AND s.id_toko = $filter_toko ";
+}
+if (!empty($keyword)) {
+    $countQuery .= " AND (b.nama_barang LIKE '%$keyword%' OR b.kode_barang LIKE '%$keyword%')";
+}
+$countResult = mysqli_query($conn, $countQuery);
+$totalRows = mysqli_fetch_assoc($countResult)['total'];
+$totalPages = ceil($totalRows / $limit);
+
+// Ambil data dengan JOIN
 $query = "
     SELECT 
-        barang.id_barang, 
-        barang.kode_barang, 
-        barang.nama_barang, 
-        barang.harga_pokok, 
-        barang.harga_jual, 
-        barang.minimal_stock, 
-        stock.stock,
-        stock.id_stock, 
-        stock.id_toko, 
-        toko.nama_toko
-    FROM barang
-    LEFT JOIN stock ON barang.id_barang = stock.id_barang
-    LEFT JOIN toko ON stock.id_toko = toko.id_toko
+        b.id_barang, 
+        b.kode_barang, 
+        b.nama_barang, 
+        b.harga_pokok, 
+        b.harga_jual, 
+        b.minimal_stock,
+        s.stock,
+        s.id_stock,
+        t.nama_toko
+    FROM barang b
+    LEFT JOIN stock s ON b.id_barang = s.id_barang
+    LEFT JOIN toko t ON s.id_toko = t.id_toko
+    WHERE 1=1
 ";
-
+if ($filter_toko > 0) {
+    $query .= " AND s.id_toko = $filter_toko ";
+}
+if (!empty($keyword)) {
+    $query .= " AND (b.nama_barang LIKE '%$keyword%' OR b.kode_barang LIKE '%$keyword%')";
+}
+$query .= " ORDER BY b.nama_barang ASC LIMIT $limit OFFSET $offset";
 
 $result = mysqli_query($conn, $query);
 ?>
 
-<!-- Begin Page Content -->
 <div class="container-fluid">
-
-    <!-- Page Heading -->
     <h1 class="h3 mb-2 text-gray-800">Barang</h1>
+
     <div class="row">
         <div class="col-md-6">
             <a href="tambah_barang.php" class="btn btn-primary mb-2">Tambah Data</a>
@@ -45,17 +74,33 @@ $result = mysqli_query($conn, $query);
         </div>
     </div>
 
-    <!-- Filter Toko -->
+    <!-- Filter dan Search -->
+    <form method="GET" class="form-inline mb-3">
+        <label class="mr-2">Filter Toko:</label>
+        <select name="filter_toko" class="form-control mr-2" onchange="this.form.submit()">
+            <option value="0">Semua Toko</option>
+            <?php
+            $toko_list = mysqli_query($conn, "SELECT id_toko, nama_toko FROM toko ORDER BY nama_toko");
+            while ($toko = mysqli_fetch_assoc($toko_list)) {
+                $selected = ($toko['id_toko'] == $filter_toko) ? 'selected' : '';
+                echo "<option value='{$toko['id_toko']}' $selected>{$toko['nama_toko']}</option>";
+            }
+            ?>
+        </select>
+        <input type="text" name="keyword" class="form-control mr-2" placeholder="Cari barang..." value="<?= htmlspecialchars($keyword) ?>">
+        <button type="submit" class="btn btn-primary">Cari</button>
+    </form>
+
+    <!-- Data Tabel -->
     <div class="card shadow mb-4">
         <div class="card-header py-3">
             <h6 class="m-0 font-weight-bold text-primary">Data Barang</h6>
         </div>
         <div class="card-body">
-            <!-- Tabel Barang -->
             <div class="table-responsive">
-                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-                    <thead>
-                        <tr class="text-center">
+                <table class="table table-bordered" width="100%" cellspacing="0">
+                    <thead class="text-center">
+                        <tr>
                             <th>No.</th>
                             <th>Kode Barang</th>
                             <th>Nama Barang</th>
@@ -68,13 +113,12 @@ $result = mysqli_query($conn, $query);
                         </tr>
                     </thead>
                     <tbody>
-                        <?php if (mysqli_num_rows($result) === 0) : ?>
+                        <?php if (mysqli_num_rows($result) === 0): ?>
                             <tr>
-                                <td colspan="9" class="text-center">Data kosong, silakan tambah data baru</td>
+                                <td colspan="9" class="text-center">Data tidak ditemukan.</td>
                             </tr>
-                        <?php else : ?>
-                            <?php $no = 1;
-                            while ($row = mysqli_fetch_assoc($result)) : ?>
+                        <?php else: ?>
+                            <?php $no = $offset + 1; while ($row = mysqli_fetch_assoc($result)) : ?>
                                 <tr class="text-center">
                                     <td><?= $no++ ?></td>
                                     <td><?= htmlspecialchars($row['kode_barang']) ?></td>
@@ -82,11 +126,11 @@ $result = mysqli_query($conn, $query);
                                     <td><?= number_format($row['harga_pokok']) ?></td>
                                     <td><?= number_format($row['harga_jual']) ?></td>
                                     <td><?= $row['minimal_stock'] ?></td>
-                                    <td><?= $row['stock'] ?></td>
-                                    <td><?= $row['nama_toko'] ?></td>
+                                    <td><?= $row['stock'] ?? 0 ?></td>
+                                    <td><?= $row['nama_toko'] ?? '-' ?></td>
                                     <td>
-                                        <a href="edit_barang.php?id=<?= $row['id_barang'] ?>" class="btn btn-success"><i class="far fa-edit"></i></a>
-                                        <a href="hapus_barang.php?id=<?= $row['id_stock'] ?>&id_barang=<?= $row['id_barang'] ?>" class="btn btn-danger tombol-hapus"><i class="far fa-trash-alt"></i></a>
+                                        <a href="edit_barang.php?id=<?= $row['id_barang'] ?>" class="btn btn-success btn-sm"><i class="far fa-edit"></i></a>
+                                        <a href="hapus_barang.php?id_barang=<?= $row['id_barang'] ?>&id_stock=<?= $row['id_stock'] ?>" class="btn btn-danger btn-sm tombol-hapus"><i class="far fa-trash-alt"></i></a>
                                     </td>
                                 </tr>
                             <?php endwhile; ?>
@@ -94,10 +138,19 @@ $result = mysqli_query($conn, $query);
                     </tbody>
                 </table>
             </div>
+
+            <!-- Pagination -->
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center">
+                    <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+                        <li class="page-item <?= ($i === $page) ? 'active' : '' ?>">
+                            <a class="page-link" href="?page=<?= $i ?>&filter_toko=<?= $filter_toko ?>&keyword=<?= urlencode($keyword) ?>"><?= $i ?></a>
+                        </li>
+                    <?php endfor; ?>
+                </ul>
+            </nav>
         </div>
     </div>
-
 </div>
-<!-- /.container-fluid -->
 
 <?php include "../layouts/footer.php" ?>
