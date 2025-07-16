@@ -11,8 +11,18 @@ require_once('../../../config.php');
 
 $id_toko = $_SESSION['id_toko'];
 
-$result = mysqli_query($conn, "SELECT barang.id_barang, barang.kode_barang, barang.nama_barang, barang.harga_pokok, barang.harga_jual, barang.minimal_stock, stock.id_toko, stock.stock  FROM barang LEFT JOIN 
-    stock ON barang.id_barang = stock.id_barang WHERE stock.id_toko = '$id_toko' ");
+$keyword = isset($_GET['keyword']) ? mysqli_real_escape_string($conn, $_GET['keyword']) : '';
+$query = "SELECT barang.id_barang, barang.kode_barang, barang.nama_barang, barang.harga_pokok, barang.harga_jual, barang.minimal_stock, stock.id_toko, stock.stock  
+FROM barang 
+LEFT JOIN stock ON barang.id_barang = stock.id_barang 
+WHERE stock.id_toko = '$id_toko'";
+
+if (!empty($keyword)) {
+    $query .= " AND (barang.nama_barang LIKE '%$keyword%' OR barang.kode_barang LIKE '%$keyword%')";
+}
+
+$result = mysqli_query($conn, $query);
+
 
 ?>
 
@@ -48,7 +58,7 @@ $result = mysqli_query($conn, "SELECT barang.id_barang, barang.kode_barang, bara
                     <tbody>
                         <?php if (mysqli_num_rows($result) === 0) { ?>
                             <tr>
-                                <td colspan="8">Data kosong, Silahkan tambah data baru</td>
+                                <td colspan="9" class="text-center">Data tidak ditemukan.</td>
                             </tr>
                         <?php } else { ?>
                             <?php $no = 1;

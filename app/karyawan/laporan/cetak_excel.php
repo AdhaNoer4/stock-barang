@@ -25,23 +25,23 @@ header("Pragma: no-cache");
 header("Expires: 0");
 
 $query = "
-    SELECT 
-        r.tanggal, 
-        b.kode_barang, 
-        b.nama_barang, 
-        b.harga_pokok, 
-        b.harga_jual, 
-        b.laba, 
-        b.minimal_stock,
-        b.id_barang,
-        r.jumlah,
-        r.jenis,
-        s.stock
-    FROM riwayat_stok r
-    JOIN barang b ON r.id_barang = b.id_barang
-    LEFT JOIN stock s ON s.id_barang = b.id_barang AND s.id_toko = $id_toko
-    WHERE s.id_toko = $id_toko
-      AND DATE(r.tanggal) = '$tanggal' ";
+   SELECT 
+    r.tanggal, 
+    b.kode_barang, 
+    b.nama_barang, 
+    b.harga_pokok, 
+    b.harga_jual, 
+    b.laba, 
+    b.minimal_stock,
+    b.id_barang,
+    r.jumlah,
+    r.jenis,
+    s.stock,
+    s.id_toko
+FROM riwayat_stok r
+LEFT JOIN barang b ON r.id_barang = b.id_barang
+LEFT JOIN stock s ON s.id_barang = b.id_barang AND s.id_toko = $id_toko
+WHERE r.id_toko = $id_toko AND DATE(r.tanggal) = '$tanggal' ";
 
 $result = mysqli_query($conn, $query);
 $rows = mysqli_fetch_all($result, MYSQLI_ASSOC);

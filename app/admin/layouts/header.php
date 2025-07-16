@@ -7,6 +7,7 @@ $tema = $setting['tema_bootstrap'];
 
 <!DOCTYPE html>
 <html lang="en">
+    
 
 <head>
 
@@ -32,6 +33,8 @@ $tema = $setting['tema_bootstrap'];
 
     <link href="../../../assets/css/sb-admin-2.min.css" rel="stylesheet">
     <link href="../../../vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
+    <!-- Select2 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 
 </head>
 
@@ -145,18 +148,19 @@ $tema = $setting['tema_bootstrap'];
                     </button>
 
                     <!-- Topbar Search -->
-                    <form
+                    <form action="../data_barang/barang.php" method="GET"
                         class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
                         <div class="input-group">
-                            <input type="text" class="form-control bg-light border-0 small" placeholder="Search for..."
-                                aria-label="Search" aria-describedby="basic-addon2">
+                            <input type="text" name="keyword" class="form-control bg-light border-0 small"
+                                placeholder="Cara barang..." aria-label="Search" aria-describedby="basic-addon2">
                             <div class="input-group-append">
-                                <button class="btn btn-primary" type="button">
+                                <button class="btn btn-primary" type="submit">
                                     <i class="fas fa-search fa-sm"></i>
                                 </button>
                             </div>
                         </div>
                     </form>
+
 
                     <!-- Topbar Navbar -->
                     <ul class="navbar-nav ml-auto">

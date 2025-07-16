@@ -9,29 +9,36 @@ if (!isset($_SESSION["login"])) {
 require_once('../../../config.php');
 include('../layouts/header.php');
 
-$id_toko = $_SESSION['id_toko']; 
+$id_toko = $_SESSION['id_toko'];
 
 if (isset($_GET['tanggal'])) {
     $tanggal = $_GET['tanggal'];
-
+    $jenis = isset($_GET['jenis']) ? $_GET['jenis'] : '';
     $query = "
         SELECT 
-            r.tanggal, 
-            b.kode_barang, 
-            b.nama_barang, 
-            b.harga_pokok, 
-            b.harga_jual, 
-            b.laba, 
-            b.minimal_stock,
-            b.id_barang,
-            r.jumlah,
-            r.jenis,
-            s.stock
-        FROM riwayat_stok r
-        JOIN barang b ON r.id_barang = b.id_barang
-        LEFT JOIN stock s ON s.id_barang = b.id_barang AND s.id_toko = $id_toko
-        WHERE s.id_toko = $id_toko
-          AND DATE(r.tanggal) = '$tanggal' ";
+    r.tanggal, 
+    b.kode_barang, 
+    b.nama_barang, 
+    b.harga_pokok, 
+    b.harga_jual, 
+    b.laba, 
+    b.minimal_stock,
+    b.id_barang,
+    r.jumlah,
+    r.jenis,
+    s.stock,
+    s.id_toko
+FROM riwayat_stok r
+LEFT JOIN barang b ON r.id_barang = b.id_barang
+LEFT JOIN stock s ON s.id_barang = b.id_barang AND s.id_toko = $id_toko
+WHERE r.id_toko = $id_toko AND DATE(r.tanggal) = '$tanggal'
+
+";
+
+    // Filter jenis jika dipilih
+    if ($jenis !== '') {
+        $query .= " AND r.jenis = '$jenis'";
+    }
 
     $result = mysqli_query($conn, $query);
     $rows = mysqli_fetch_all($result, MYSQLI_ASSOC);
@@ -47,11 +54,19 @@ if (isset($_GET['tanggal'])) {
                 <input type="date" class="form-control" id="tanggal" name="tanggal" value="<?= isset($_GET['tanggal']) ? $_GET['tanggal'] : '' ?>" required>
             </div>
             <div class="col-auto">
+                <label for="jenis" class="form-label">Jenis</label>
+                <select name="jenis" id="jenis" class="form-select">
+                    <option value="">Semua</option>
+                    <option value="masuk" <?= isset($_GET['jenis']) && $_GET['jenis'] === 'masuk' ? 'selected' : '' ?>>Masuk</option>Add commentMore actions
+                    <option value="keluar" <?= isset($_GET['jenis']) && $_GET['jenis'] === 'keluar' ? 'selected' : '' ?>>Keluar</option>
+                </select>
+            </div>
+            <div class="col-auto">
                 <button type="submit" class="btn btn-primary">Tampilkan Laporan</button>
             </div>
         </div>
     </form>
-    <form method="POST" action="../../../cetak_pdf.php" target="_blank">
+    <form method="POST" action="cetak_pdf.php" target="_blank">
         <input type="hidden" name="tanggal" value="<?= $tanggal ?>">
         <button type="submit" class="btn btn-danger mt-3">Download PDF</button>
     </form>
@@ -85,7 +100,7 @@ if (isset($_GET['tanggal'])) {
             }
             foreach ($rows as $data):
                 $idb = $data['id_barang'];
-                
+
             ?>
                 <tr>
                     <td><?= $no++ ?></td>
@@ -97,7 +112,7 @@ if (isset($_GET['tanggal'])) {
                     <td><?= number_format($data['laba']) ?></td>
                     <td><?= $data['stock'] ?? 0 ?></td>
                     <td><?= $data['minimal_stock'] ?></td>
-                    <td><?= $data['jenis'] == 'masuk' ? '+' . $data['jumlah'] : '0' ?></td>
+                    <td><?= $data['jenis'] == 'masuk' ? '+' . $data['jumlah'] : '-' . $data['jumlah'] ?></td>
 
                 </tr>
             <?php endforeach; ?>

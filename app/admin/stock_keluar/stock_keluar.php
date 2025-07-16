@@ -17,22 +17,29 @@ if (isset($_POST['pilih_toko'])) {
 // Ambil toko dari session jika sudah dipilih
 $id_toko_terpilih = $_SESSION['id_toko'] ?? '';
 
-// Ambil data barang berdasarkan toko
 $barang = [];
-if ($id_toko_terpilih) {
-    $barang = mysqli_query($conn, "SELECT b.nama_barang, s.id_barang FROM stock s JOIN barang b ON s.id_barang = b.id_barang WHERE id_toko = '$id_toko_terpilih' ORDER BY b.nama_barang ASC");
+if (!empty($id_toko_terpilih)) {
+    $barang = mysqli_query($conn, "SELECT b.nama_barang, s.id_barang 
+        FROM stock s 
+        JOIN barang b ON s.id_barang = b.id_barang 
+        WHERE s.id_toko = '$id_toko_terpilih' 
+        ORDER BY b.nama_barang ASC");
 }
 
-// Ambil riwayat keluar hari ini
-$result = mysqli_query($conn, "
-    SELECT rs.*, s.id_barang, u.nama, b.nama_barang 
-    FROM riwayat_stok rs 
-    JOIN stock s ON rs.id_barang = s.id_barang 
-    JOIN user u ON rs.id_user = u.id_user 
-    JOIN barang b ON rs.id_barang = b.id_barang 
-    WHERE rs.jenis = 'keluar' AND rs.tanggal = CURDATE() AND rs.id_toko = '$id_toko_terpilih'
-    ORDER BY rs.tanggal DESC
-");
+// Ambil riwayat stok masuk hari ini untuk toko terpilih
+$result = [];
+if (!empty($id_toko_terpilih)) {
+    $result = mysqli_query($conn, "
+        SELECT rs.*, u.nama, b.nama_barang 
+        FROM riwayat_stok rs
+        JOIN barang b ON rs.id_barang = b.id_barang
+        JOIN user u ON rs.id_user = u.id_user
+        WHERE rs.jenis = 'keluar' 
+          AND rs.tanggal = CURDATE()
+          AND rs.id_toko = '$id_toko_terpilih'
+        ORDER BY rs.tanggal DESC
+    ");
+}
 ?>
 
 <div class="container-fluid">
@@ -63,14 +70,14 @@ $result = mysqli_query($conn, "
                     <div class="card">
                         <div class="card-body">
                             <div class="mb-3">
-                                <label for="id_barang">Nama Barang</label>
-                                <select name="id_barang" class="form-control" required>
-                                    <option value="">--Pilih Barang--</option>
-                                    <?php while ($row = mysqli_fetch_assoc($barang)): ?>
-                                        <option value="<?= $row['id_barang'] ?>"><?= $row['nama_barang'] ?></option>
-                                    <?php endwhile; ?>
-                                </select>
-                            </div>
+                                        <label for="id_barang">Nama Barang</label>
+                                        <select name="id_barang" class="form-control select-barang" required>
+                                            <option value="">--Cari Barang--</option>
+                                            <?php while ($row = mysqli_fetch_assoc($barang)): ?>
+                                                <option value="<?= $row['id_barang'] ?>"><?= $row['nama_barang'] ?></option>
+                                            <?php endwhile; ?>
+                                        </select>
+                                    </div>
 
                             <div class="mb-3">
                                 <label for="jumlah">Jumlah Keluar</label>
